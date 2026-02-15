@@ -12,6 +12,6 @@ class CreateGenerationPasses < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :generation_passes, [:user_id, :status]
+    add_index :generation_passes, [ :user_id, :status ]
   end
 end

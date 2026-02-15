@@ -16,7 +16,7 @@ class CreatePayments < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :payments, [:payable_type, :payable_id]
+    add_index :payments, [ :payable_type, :payable_id ]
     add_index :payments, :provider_payment_id, unique: true, where: "provider_payment_id IS NOT NULL"
     add_index :payments, :status
   end

@@ -9,7 +9,7 @@ class CreateUsageCounters < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :usage_counters, [:user_id, :period], unique: true, where: "user_id IS NOT NULL", name: "idx_usage_counters_user_period"
-    add_index :usage_counters, [:anonymous_identity_id, :period], unique: true, where: "anonymous_identity_id IS NOT NULL", name: "idx_usage_counters_anon_period"
+    add_index :usage_counters, [ :user_id, :period ], unique: true, where: "user_id IS NOT NULL", name: "idx_usage_counters_user_period"
+    add_index :usage_counters, [ :anonymous_identity_id, :period ], unique: true, where: "anonymous_identity_id IS NOT NULL", name: "idx_usage_counters_anon_period"
   end
 end

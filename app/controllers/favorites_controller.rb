@@ -4,7 +4,7 @@ class FavoritesController < ApplicationController
   # S14: favorites screen
   def index
     @favorites = current_user.favorites
-      .includes(design: [:style, :tags, generations: :generation_variants])
+      .includes(design: [ :style, :tags, generations: :generation_variants ])
       .order(created_at: :desc)
     @designs = @favorites.map(&:design)
   end

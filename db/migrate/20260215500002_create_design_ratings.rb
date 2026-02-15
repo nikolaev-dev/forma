@@ -10,6 +10,6 @@ class CreateDesignRatings < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :design_ratings, [:design_id, :user_id], unique: true, where: "source = 'user'", name: "idx_design_ratings_user_unique"
+    add_index :design_ratings, [ :design_id, :user_id ], unique: true, where: "source = 'user'", name: "idx_design_ratings_user_unique"
   end
 end

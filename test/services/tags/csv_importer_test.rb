@@ -4,7 +4,7 @@ require "tempfile"
 class Tags::CsvImporterTest < ActiveSupport::TestCase
   setup do
     @category = create(:tag_category, slug: "mood")
-    @csv_file = Tempfile.new(["tags", ".csv"])
+    @csv_file = Tempfile.new([ "tags", ".csv" ])
   end
 
   teardown do

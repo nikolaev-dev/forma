@@ -7,6 +7,6 @@ class CreateFavorites < ActiveRecord::Migration[8.0]
       t.datetime :created_at, null: false
     end
 
-    add_index :favorites, [:user_id, :design_id], unique: true
+    add_index :favorites, [ :user_id, :design_id ], unique: true
   end
 end

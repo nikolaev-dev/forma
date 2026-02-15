@@ -9,6 +9,6 @@ class CreateOrderFiles < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :order_files, [:order_id, :file_type]
+    add_index :order_files, [ :order_id, :file_type ]
   end
 end

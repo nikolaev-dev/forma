@@ -25,7 +25,7 @@ class Admin::StylesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create creates style with audit log" do
-    assert_difference ["Style.count", "AuditLog.count"], 1 do
+    assert_difference [ "Style.count", "AuditLog.count" ], 1 do
       post admin_styles_path, params: {
         style: { name: "Новый стиль", slug: "new-admin-style", status: "draft" }
       }
@@ -72,7 +72,7 @@ class Admin::StylesControllerTest < ActionDispatch::IntegrationTest
 
     post admin_styles_path, params: {
       style: { name: "С тегами", slug: "with-tags", status: "draft" },
-      tag_ids: [tag1.id, tag2.id]
+      tag_ids: [ tag1.id, tag2.id ]
     }
 
     style = Style.find_by(slug: "with-tags")

@@ -209,16 +209,16 @@ Rails.application.config.active_job.queue_adapter = :inline
 
 # Палитра цветов для стилей (обложки-заглушки с градиентами и фигурами)
 STYLE_PALETTES = {
-  "japanese-minimalism"  => { bg: [245, 240, 235], fg: [180, 160, 140], accent: [120, 100, 80]  },
-  "italian-marble"       => { bg: [245, 245, 250], fg: [200, 190, 200], accent: [200, 170, 80]  },
-  "scandinavian-cozy"    => { bg: [250, 245, 240], fg: [210, 195, 175], accent: [180, 160, 130] },
-  "french-art-deco"      => { bg: [30, 30, 35],    fg: [200, 170, 80],  accent: [255, 215, 100] },
-  "moroccan-ceramic"     => { bg: [220, 160, 100], fg: [60, 120, 120],  accent: [200, 80, 60]   },
-  "night-sky"            => { bg: [15, 15, 45],    fg: [40, 40, 80],    accent: [255, 255, 200] },
-  "spring-garden"        => { bg: [250, 240, 245], fg: [220, 180, 190], accent: [180, 220, 160] },
-  "desert-sunset"        => { bg: [230, 170, 100], fg: [200, 120, 60],  accent: [250, 200, 80]  },
-  "velvet-night"         => { bg: [50, 20, 35],    fg: [100, 40, 60],   accent: [180, 80, 100]  },
-  "mountain-mist"        => { bg: [200, 215, 230], fg: [150, 170, 190], accent: [100, 130, 160] }
+  "japanese-minimalism"  => { bg: [ 245, 240, 235 ], fg: [ 180, 160, 140 ], accent: [ 120, 100, 80 ]  },
+  "italian-marble"       => { bg: [ 245, 245, 250 ], fg: [ 200, 190, 200 ], accent: [ 200, 170, 80 ]  },
+  "scandinavian-cozy"    => { bg: [ 250, 245, 240 ], fg: [ 210, 195, 175 ], accent: [ 180, 160, 130 ] },
+  "french-art-deco"      => { bg: [ 30, 30, 35 ],    fg: [ 200, 170, 80 ],  accent: [ 255, 215, 100 ] },
+  "moroccan-ceramic"     => { bg: [ 220, 160, 100 ], fg: [ 60, 120, 120 ],  accent: [ 200, 80, 60 ]   },
+  "night-sky"            => { bg: [ 15, 15, 45 ],    fg: [ 40, 40, 80 ],    accent: [ 255, 255, 200 ] },
+  "spring-garden"        => { bg: [ 250, 240, 245 ], fg: [ 220, 180, 190 ], accent: [ 180, 220, 160 ] },
+  "desert-sunset"        => { bg: [ 230, 170, 100 ], fg: [ 200, 120, 60 ],  accent: [ 250, 200, 80 ]  },
+  "velvet-night"         => { bg: [ 50, 20, 35 ],    fg: [ 100, 40, 60 ],   accent: [ 180, 80, 100 ]  },
+  "mountain-mist"        => { bg: [ 200, 215, 230 ], fg: [ 150, 170, 190 ], accent: [ 100, 130, 160 ] }
 }
 
 POPULARITY_SCORES = {
@@ -250,7 +250,7 @@ def generate_cover_png(palette, width: 360, height: 480)
   accent_color = ChunkyPNG::Color.rgb(*accent)
 
   # Large circle
-  cx, cy, cr = width / 2, height / 3, [width, height].min / 4
+  cx, cy, cr = width / 2, height / 3, [ width, height ].min / 4
   (cy - cr..cy + cr).each do |y|
     next if y < 0 || y >= height
     (cx - cr..cx + cr).each do |x|

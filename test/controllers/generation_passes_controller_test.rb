@@ -59,7 +59,7 @@ class GenerationPassesControllerTest < ActionDispatch::IntegrationTest
       .stubs(:create_payment)
       .returns(mock_result)
 
-    assert_difference ["GenerationPass.count", "Payment.count"], 1 do
+    assert_difference [ "GenerationPass.count", "Payment.count" ], 1 do
       post generation_passes_path
     end
 

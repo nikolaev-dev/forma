@@ -10,8 +10,8 @@ class Generations::RateLimiterTest < ActiveSupport::TestCase
 
   teardown do
     # Clean up only our test-specific keys
-    ["rate_limit:user:#{@user.id}", "rate_limit:anon:#{@anon.id}",
-     "rate_limit:ip:#{@test_id}"].each { |k| @redis.del(k) }
+    [ "rate_limit:user:#{@user.id}", "rate_limit:anon:#{@anon.id}",
+     "rate_limit:ip:#{@test_id}" ].each { |k| @redis.del(k) }
   end
 
   test "allows first request for user" do

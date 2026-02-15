@@ -1,5 +1,5 @@
 class GenerationPassesController < ApplicationController
-  before_action :require_auth, only: [:new, :create, :confirmed]
+  before_action :require_auth, only: [ :new, :create, :confirmed ]
 
   def limit_reached
     @has_active_pass = current_user && GenerationPass.active_for(current_user).exists?

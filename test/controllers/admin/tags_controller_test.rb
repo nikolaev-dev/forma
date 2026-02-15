@@ -35,7 +35,7 @@ class Admin::TagsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create creates tag with audit log" do
-    assert_difference ["Tag.count", "AuditLog.count"], 1 do
+    assert_difference [ "Tag.count", "AuditLog.count" ], 1 do
       post admin_tags_path, params: {
         tag: { name: "Лёд", slug: "ice", tag_category_id: @category.id, visibility: "public", kind: "generic", weight: 1.0 }
       }

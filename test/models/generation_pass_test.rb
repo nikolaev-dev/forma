@@ -88,6 +88,6 @@ class GenerationPassTest < ActiveSupport::TestCase
   test "has_many payments as payable" do
     pass = create(:generation_pass, user: @user)
     payment = create(:payment, payable: pass, amount_cents: 10000)
-    assert_equal [payment], pass.payments.to_a
+    assert_equal [ payment ], pass.payments.to_a
   end
 end

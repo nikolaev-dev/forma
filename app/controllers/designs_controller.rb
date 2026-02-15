@@ -1,6 +1,6 @@
 class DesignsController < ApplicationController
-  before_action :set_design, only: [:show, :remix, :toggle_favorite, :rate]
-  before_action :require_auth, only: [:toggle_favorite, :rate]
+  before_action :set_design, only: [ :show, :remix, :toggle_favorite, :rate ]
+  before_action :require_auth, only: [ :toggle_favorite, :rate ]
 
   # S7: public design page
   def show

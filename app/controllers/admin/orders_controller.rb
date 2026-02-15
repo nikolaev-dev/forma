@@ -1,6 +1,6 @@
 module Admin
   class OrdersController < BaseController
-    before_action :set_order, only: [:show, :change_status]
+    before_action :set_order, only: [ :show, :change_status ]
 
     def index
       @orders = Order.order(created_at: :desc)
@@ -58,7 +58,7 @@ module Admin
     def generate_csv(orders)
       require "csv"
       CSV.generate(headers: true) do |csv|
-        csv << ["Номер", "Статус", "Клиент", "Email", "Телефон", "Сумма (коп.)", "Дата"]
+        csv << [ "Номер", "Статус", "Клиент", "Email", "Телефон", "Сумма (коп.)", "Дата" ]
         orders.find_each do |order|
           csv << [
             order.order_number,

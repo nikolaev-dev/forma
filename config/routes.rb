@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   end
 
   # Designs (S7: public design page)
-  resources :designs, only: [:show] do
+  resources :designs, only: [ :show ] do
     member do
       post :remix
       post :toggle_favorite
@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   end
 
   # Favorites (S14)
-  resources :favorites, only: [:index]
+  resources :favorites, only: [ :index ]
 
   # Orders (S8 → S12)
   resources :orders, only: [ :new, :show, :update ] do
@@ -42,7 +42,7 @@ Rails.application.routes.draw do
   end
 
   # Generation passes (безлимит)
-  resources :generation_passes, only: [:new, :create] do
+  resources :generation_passes, only: [ :new, :create ] do
     collection do
       get :limit_reached   # L1: экран "Лимит исчерпан"
     end
@@ -72,7 +72,7 @@ Rails.application.routes.draw do
       member do
         post :merge
       end
-      resources :synonyms, only: [:create, :destroy], controller: "tag_synonyms"
+      resources :synonyms, only: [ :create, :destroy ], controller: "tag_synonyms"
     end
     resources :styles, except: :show do
       member do
@@ -80,7 +80,7 @@ Rails.application.routes.draw do
         patch :hide
       end
     end
-    resources :orders, only: [:index, :show] do
+    resources :orders, only: [ :index, :show ] do
       member do
         patch :change_status
       end
@@ -88,8 +88,8 @@ Rails.application.routes.draw do
         get :export_csv
       end
     end
-    resources :settings, only: [:index, :update], param: :key
-    resources :audit_logs, only: [:index]
+    resources :settings, only: [ :index, :update ], param: :key
+    resources :audit_logs, only: [ :index ]
   end
 
   # Health check

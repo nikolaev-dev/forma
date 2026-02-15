@@ -20,6 +20,6 @@ class Style < ApplicationRecord
 
   def cover_thumb
     return nil unless cover_image.attached?
-    cover_image.variant(resize_to_limit: [300, 400])
+    cover_image.variant(resize_to_limit: [ 300, 400 ])
   end
 end

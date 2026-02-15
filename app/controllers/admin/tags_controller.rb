@@ -1,6 +1,6 @@
 module Admin
   class TagsController < BaseController
-    before_action :set_tag, only: [:edit, :update, :destroy, :merge]
+    before_action :set_tag, only: [ :edit, :update, :destroy, :merge ]
 
     def index
       @tags = Tag.includes(:tag_category).order(:name)

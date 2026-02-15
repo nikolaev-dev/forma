@@ -1,6 +1,6 @@
 module Admin
   class StylesController < BaseController
-    before_action :set_style, only: [:edit, :update, :destroy, :publish, :hide]
+    before_action :set_style, only: [ :edit, :update, :destroy, :publish, :hide ]
 
     def index
       @styles = Style.order(:position, :name)

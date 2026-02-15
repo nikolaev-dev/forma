@@ -31,7 +31,7 @@ class Generations::Providers::TestProviderTest < ActiveSupport::TestCase
   test "fetch_result returns valid PNG data" do
     result = @provider.fetch_result("any-id")
     # PNG magic bytes
-    assert result[:image_data].bytes[0..3] == [0x89, 0x50, 0x4E, 0x47]
+    assert result[:image_data].bytes[0..3] == [ 0x89, 0x50, 0x4E, 0x47 ]
   end
 
   test "cancel returns true" do

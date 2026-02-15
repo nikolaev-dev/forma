@@ -24,12 +24,12 @@ class CatalogItemTest < ActiveSupport::TestCase
     section = create(:catalog_section)
     second = create(:catalog_item, catalog_section: section, position: 2)
     first = create(:catalog_item, catalog_section: section, position: 1)
-    assert_equal [first, second], CatalogItem.ordered.where(catalog_section: section).to_a
+    assert_equal [ first, second ], CatalogItem.ordered.where(catalog_section: section).to_a
   end
 
   test "pinned scope" do
     pinned = create(:catalog_item, pinned: true)
     create(:catalog_item, pinned: false)
-    assert_equal [pinned], CatalogItem.pinned.to_a
+    assert_equal [ pinned ], CatalogItem.pinned.to_a
   end
 end

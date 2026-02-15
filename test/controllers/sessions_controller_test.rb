@@ -33,7 +33,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       credentials: { token: "tok", refresh_token: nil, expires_at: nil }
     )
 
-    assert_difference ["User.count", "OauthIdentity.count"], 1 do
+    assert_difference [ "User.count", "OauthIdentity.count" ], 1 do
       post "/auth/google/callback"
     end
 
