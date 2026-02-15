@@ -25,8 +25,8 @@
 - [x] Настроить PostgreSQL (extensions: citext, pg_trgm, unaccent)
 - [x] Настроить Redis + Sidekiq
 - [x] Настроить ActiveStorage + S3-compatible (Yandex Object Storage / MinIO)
-- [ ] Настроить CI/CD (опционально, но рекомендуется)
-- [ ] Настроить линтеры (RuboCop, etc.)
+- [x] Настроить CI/CD (GitHub Actions: lint, test, security scan, dependabot)
+- [x] Настроить линтеры (RuboCop rails-omakase, 0 offenses)
 - [x] Создать базовые миграции: users, oauth_identities, anonymous_identities
 - [x] Настроить OmniAuth (VK, Яндекс, T-Bank, Альфа, Gmail)
 - [x] Базовая аутентификация (сессии/токены)
