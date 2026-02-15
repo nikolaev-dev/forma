@@ -1,0 +1,6 @@
+<% content_for(:title) { "Новый стиль — FORMA Admin" } %>
+
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Новый стиль</h1>
+  <%= render "admin/styles/form", style: @style, tags: @tags, selected_tag_ids: [] %>
+</div>

@@ -1,0 +1,132 @@
+<% content_for(:title) { "Заказ #{@order.order_number} — FORMA Admin" } %>
+
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold"><%= @order.order_number %></h1>
+      <span class="px-2 py-0.5 rounded text-xs <%= order_status_class(@order.status) %>"><%= order_status_label(@order.status) %></span>
+    </div>
+    <%= link_to "Все заказы", admin_orders_path, class: "text-sm text-blue-600 hover:underline" %>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6">
+    <%# Client info %>
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="font-semibold mb-3">Клиент</h2>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between"><dt class="text-gray-500">Имя</dt><dd><%= @order.customer_name %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">Email</dt><dd><%= @order.customer_email %></dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">Телефон</dt><dd><%= @order.customer_phone %></dd></div>
+        <% if @order.notes.present? %>
+          <div><dt class="text-gray-500">Комментарий</dt><dd class="mt-1"><%= @order.notes %></dd></div>
+        <% end %>
+      </dl>
+    </div>
+
+    <%# Barcode %>
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="font-semibold mb-3">Штрихкод</h2>
+      <div class="flex justify-center">
+        <div>
+          <% barcode_png = Orders::BarcodeGenerator.call(@order) %>
+          <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(barcode_png)}", class: "h-16" %>
+          <p class="text-xs text-center text-gray-500 mt-2 font-mono"><%= @order.barcode_value %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Order items %>
+  <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+    <h2 class="font-semibold mb-3">Состав заказа</h2>
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-gray-500 border-b">
+        <th class="pb-2">Дизайн</th><th class="pb-2">Комплектация</th><th class="pb-2">Наполнение</th>
+        <th class="pb-2">Кол-во</th><th class="pb-2 text-right">Сумма</th>
+      </tr></thead>
+      <tbody>
+        <% @order_items.each do |item| %>
+          <tr class="border-b last:border-0">
+            <td class="py-2"><%= item.design.title || item.design.slug || "Design ##{item.design.id}" %></td>
+            <td class="py-2"><%= item.notebook_sku.name %></td>
+            <td class="py-2"><%= item.filling.name %></td>
+            <td class="py-2"><%= item.quantity %></td>
+            <td class="py-2 text-right"><%= number_to_currency(item.total_price_cents / 100.0, unit: "\u20BD", format: "%n %u") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <div class="flex justify-between font-bold mt-3 pt-3 border-t">
+      <span>Итого</span>
+      <span><%= number_to_currency(@order.total_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+    </div>
+  </div>
+
+  <%# Status actions %>
+  <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+    <h2 class="font-semibold mb-3">Управление статусом</h2>
+    <div class="flex flex-wrap gap-2">
+      <% Order::TRANSITIONS.fetch(@order.status, []).each do |target| %>
+        <% if target == "shipped" %>
+          <%= form_with url: change_status_admin_order_path(@order), method: :patch, class: "flex gap-2 items-center" do |f| %>
+            <%= f.hidden_field :new_status, value: target %>
+            <%= f.text_field :tracking_number, placeholder: "Трек-номер", class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+            <%= f.submit "Отправлен", class: "px-4 py-1.5 bg-purple-600 text-white text-sm rounded-lg cursor-pointer" %>
+          <% end %>
+        <% else %>
+          <%= link_to order_status_label(target),
+              change_status_admin_order_path(@order, new_status: target),
+              data: { turbo_method: :patch, turbo_confirm: "Изменить статус на \"#{order_status_label(target)}\"?" },
+              class: "px-4 py-1.5 bg-gray-200 text-sm rounded-lg hover:bg-gray-300" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Payments %>
+  <% if @payments.any? %>
+    <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="font-semibold mb-3">Платежи</h2>
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-gray-500 border-b">
+          <th class="pb-2">Provider ID</th><th class="pb-2">Статус</th><th class="pb-2">Сумма</th><th class="pb-2">Дата</th>
+        </tr></thead>
+        <tbody>
+          <% @payments.each do |payment| %>
+            <tr class="border-b last:border-0">
+              <td class="py-2 font-mono text-xs"><%= payment.provider_payment_id %></td>
+              <td class="py-2"><%= payment.status %></td>
+              <td class="py-2"><%= number_to_currency(payment.amount_cents / 100.0, unit: "\u20BD", format: "%n %u") %></td>
+              <td class="py-2 text-gray-500"><%= payment.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <%# Order files %>
+  <% if @order_files.any? %>
+    <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="font-semibold mb-3">Файлы производства</h2>
+      <div class="space-y-2">
+        <% @order_files.each do |of| %>
+          <div class="flex items-center justify-between py-2 border-b last:border-0">
+            <span class="text-sm"><%= of.file_type %></span>
+            <span class="px-2 py-0.5 rounded text-xs
+                  <%= of.status == 'ready' ? 'bg-green-100 text-green-700' : of.status == 'failed' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600' %>">
+              <%= of.status %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @order.tracking_number.present? %>
+    <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="font-semibold mb-3">Доставка</h2>
+      <p class="text-sm">Трек-номер: <span class="font-mono"><%= @order.tracking_number %></span></p>
+    </div>
+  <% end %>
+</div>

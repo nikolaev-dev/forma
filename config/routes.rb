@@ -40,6 +40,36 @@ Rails.application.routes.draw do
     get "generations/:id/status", to: "generations#status", as: :generation_status
   end
 
+  # Admin
+  namespace :admin do
+    root "dashboard#index"
+    resources :tags, except: :show do
+      collection do
+        post :import_csv
+      end
+      member do
+        post :merge
+      end
+      resources :synonyms, only: [:create, :destroy], controller: "tag_synonyms"
+    end
+    resources :styles, except: :show do
+      member do
+        patch :publish
+        patch :hide
+      end
+    end
+    resources :orders, only: [:index, :show] do
+      member do
+        patch :change_status
+      end
+      collection do
+        get :export_csv
+      end
+    end
+    resources :settings, only: [:index, :update], param: :key
+    resources :audit_logs, only: [:index]
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 

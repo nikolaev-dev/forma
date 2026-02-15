@@ -1,0 +1,67 @@
+<%= form_with model: tag, url: tag.persisted? ? admin_tag_path(tag) : admin_tags_path,
+              class: "bg-white rounded-lg border border-gray-200 p-4 space-y-4" do |f| %>
+  <% if tag.errors.any? %>
+    <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+      <% tag.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Название</label>
+      <%= f.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm", required: true %>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Slug</label>
+      <%= f.text_field :slug, class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm", required: true %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Категория</label>
+      <%= f.select :tag_category_id, categories.map { |c| [c.name, c.id] },
+          { prompt: "Выберите..." },
+          class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Видимость</label>
+      <%= f.select :visibility, [["Public", "public"], ["Hidden", "hidden"]],
+          {},
+          class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Тип</label>
+      <%= f.select :kind, [["Generic", "generic"], ["Brand Mood", "brand_mood"]],
+          {},
+          class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Вес</label>
+      <%= f.number_field :weight, step: 0.001, class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div class="flex items-end pb-2">
+      <label class="flex items-center gap-2 text-sm">
+        <%= f.check_box :is_banned %> Запрещён
+      </label>
+    </div>
+  </div>
+
+  <% if tag.is_banned || tag.new_record? %>
+    <div>
+      <label class="block text-sm font-medium mb-1">Причина бана</label>
+      <%= f.text_field :banned_reason, class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-2">
+    <%= f.submit tag.persisted? ? "Сохранить" : "Создать",
+        class: "px-4 py-2 bg-gray-900 text-white text-sm rounded-lg cursor-pointer" %>
+    <%= link_to "Отмена", admin_tags_path, class: "px-4 py-2 bg-gray-100 text-sm rounded-lg" %>
+  </div>
+<% end %>

@@ -1,0 +1,86 @@
+<% content_for(:title) { "Теги — FORMA Admin" } %>
+
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Теги (<%= @tags.size %>)</h1>
+    <div class="flex gap-2">
+      <%= link_to "Создать тег", new_admin_tag_path, class: "px-4 py-2 bg-gray-900 text-white text-sm rounded-lg" %>
+    </div>
+  </div>
+
+  <%# Filters %>
+  <%= form_with url: admin_tags_path, method: :get, class: "flex flex-wrap gap-3 mb-6 items-end", data: { turbo_frame: "_top" } do |f| %>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Категория</label>
+      <%= f.select :category_id, @categories.map { |c| [c.name, c.id] },
+          { include_blank: "Все", selected: params[:category_id] },
+          class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Видимость</label>
+      <%= f.select :visibility, [["Public", "public"], ["Hidden", "hidden"]],
+          { include_blank: "Все", selected: params[:visibility] },
+          class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="flex items-center gap-1.5 text-sm">
+        <%= f.check_box :banned, { checked: params[:banned] == "1" }, "1", "0" %> Запрещённые
+      </label>
+    </div>
+    <div>
+      <%= f.text_field :q, value: params[:q], placeholder: "Поиск по имени...",
+          class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <%= f.submit "Фильтр", class: "px-4 py-1.5 bg-gray-200 text-sm rounded-lg cursor-pointer" %>
+  <% end %>
+
+  <%# CSV import %>
+  <%= form_with url: import_csv_admin_tags_path, method: :post, multipart: true, class: "flex gap-2 mb-6 items-center" do |f| %>
+    <%= f.file_field :file, accept: ".csv", class: "text-sm" %>
+    <%= f.submit "Импорт CSV", class: "px-3 py-1.5 bg-gray-200 text-sm rounded-lg cursor-pointer" %>
+  <% end %>
+
+  <%# Table %>
+  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Имя</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Slug</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Категория</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Вид</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Вес</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Статус</th>
+          <th class="text-right px-4 py-3 font-medium text-gray-500">Действия</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @tags.each do |tag| %>
+          <tr>
+            <td class="px-4 py-3 font-medium"><%= tag.name %></td>
+            <td class="px-4 py-3 text-gray-500 font-mono text-xs"><%= tag.slug %></td>
+            <td class="px-4 py-3"><%= tag.tag_category.name %></td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-xs <%= tag.visibility == 'hidden' ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700' %>">
+                <%= tag.visibility %>
+              </span>
+              <% if tag.kind == "brand_mood" %>
+                <span class="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 ml-1">brand</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-3"><%= tag.weight %></td>
+            <td class="px-4 py-3">
+              <% if tag.is_banned %>
+                <span class="px-2 py-0.5 rounded text-xs bg-red-100 text-red-600">banned</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-3 text-right space-x-2">
+              <%= link_to "Ред.", edit_admin_tag_path(tag), class: "text-blue-600 hover:underline" %>
+              <%= link_to "Удалить", admin_tag_path(tag), data: { turbo_method: :delete, turbo_confirm: "Удалить тег \"#{tag.name}\"?" }, class: "text-red-600 hover:underline" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

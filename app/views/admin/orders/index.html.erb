@@ -1,0 +1,69 @@
+<% content_for(:title) { "Заказы — FORMA Admin" } %>
+
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Заказы (<%= @orders.size %>)</h1>
+    <%= link_to "Экспорт CSV", export_csv_admin_orders_path(status: params[:status]),
+        class: "px-4 py-2 bg-gray-200 text-sm rounded-lg" %>
+  </div>
+
+  <%# Filters %>
+  <%= form_with url: admin_orders_path, method: :get, class: "flex flex-wrap gap-3 mb-6 items-end" do |f| %>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Статус</label>
+      <%= f.select :status,
+          Order.statuses.keys.map { |s| [order_status_label(s), s] },
+          { include_blank: "Все", selected: params[:status] },
+          class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">От</label>
+      <%= f.date_field :from, value: params[:from], class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">До</label>
+      <%= f.date_field :to, value: params[:to], class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <div>
+      <%= f.text_field :q, value: params[:q], placeholder: "Номер / email / телефон...",
+          class: "px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+    </div>
+    <%= f.submit "Фильтр", class: "px-4 py-1.5 bg-gray-200 text-sm rounded-lg cursor-pointer" %>
+  <% end %>
+
+  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Номер</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Клиент</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Статус</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Сумма</th>
+          <th class="text-left px-4 py-3 font-medium text-gray-500">Дата</th>
+          <th class="text-right px-4 py-3 font-medium text-gray-500"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @orders.each do |order| %>
+          <tr>
+            <td class="px-4 py-3 font-mono text-xs">
+              <%= link_to order.order_number, admin_order_path(order), class: "text-blue-600 hover:underline" %>
+            </td>
+            <td class="px-4 py-3">
+              <div><%= order.customer_name %></div>
+              <div class="text-xs text-gray-500"><%= order.customer_email %></div>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-xs <%= order_status_class(order.status) %>"><%= order_status_label(order.status) %></span>
+            </td>
+            <td class="px-4 py-3"><%= number_to_currency(order.total_cents / 100.0, unit: "\u20BD", format: "%n %u") %></td>
+            <td class="px-4 py-3 text-gray-500"><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+            <td class="px-4 py-3 text-right">
+              <%= link_to "Открыть", admin_order_path(order), class: "text-blue-600 hover:underline" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

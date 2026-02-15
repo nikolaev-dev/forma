@@ -1,0 +1,6 @@
+<% content_for(:title) { "Новый тег — FORMA Admin" } %>
+
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Новый тег</h1>
+  <%= render "admin/tags/form", tag: @tag, categories: @categories %>
+</div>

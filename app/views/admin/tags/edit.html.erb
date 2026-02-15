@@ -1,0 +1,37 @@
+<% content_for(:title) { "#{@tag.name} — FORMA Admin" } %>
+
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Редактирование: <%= @tag.name %></h1>
+  <%= render "admin/tags/form", tag: @tag, categories: @categories %>
+
+  <%# Synonyms %>
+  <div class="mt-8 bg-white rounded-lg border border-gray-200 p-4">
+    <h2 class="font-semibold mb-3">Синонимы</h2>
+    <% @tag.tag_synonyms.each do |syn| %>
+      <div class="flex items-center justify-between py-1 border-b last:border-0">
+        <span class="text-sm"><%= syn.phrase %> <span class="text-gray-400">(<%= syn.normalized %>)</span></span>
+        <%= link_to "Удалить", admin_tag_synonym_path(@tag, syn),
+            data: { turbo_method: :delete, turbo_confirm: "Удалить синоним?" },
+            class: "text-red-600 text-xs hover:underline" %>
+      </div>
+    <% end %>
+    <%= form_with url: admin_tag_synonyms_path(@tag), class: "flex gap-2 mt-3" do |f| %>
+      <%= f.text_field :tag_synonym, value: nil, name: "tag_synonym[phrase]", placeholder: "Новый синоним...",
+          class: "flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+      <%= f.submit "Добавить", class: "px-3 py-1.5 bg-gray-200 text-sm rounded-lg cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <%# Merge %>
+  <div class="mt-8 bg-white rounded-lg border border-gray-200 p-4">
+    <h2 class="font-semibold mb-3">Объединить с другим тегом</h2>
+    <p class="text-xs text-gray-500 mb-3">Все связи будут перенесены на выбранный тег, текущий будет удалён.</p>
+    <%= form_with url: merge_admin_tag_path(@tag), method: :post, class: "flex gap-2" do |f| %>
+      <%= f.select :target_tag_id, Tag.where.not(id: @tag.id).order(:name).map { |t| ["#{t.name} (#{t.slug})", t.id] },
+          { prompt: "Выберите тег..." },
+          class: "flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm" %>
+      <%= f.submit "Объединить", class: "px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg cursor-pointer",
+          data: { turbo_confirm: "Это действие необратимо. Продолжить?" } %>
+    <% end %>
+  </div>
+</div>

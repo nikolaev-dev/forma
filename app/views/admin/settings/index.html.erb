@@ -1,0 +1,27 @@
+<% content_for(:title) { "Настройки — FORMA Admin" } %>
+
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Настройки</h1>
+
+  <div class="space-y-4">
+    <% @settings.each do |setting| %>
+      <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <%= form_with url: admin_setting_path(key: setting.key), method: :patch, class: "flex items-end gap-4" do |f| %>
+          <div class="flex-1">
+            <label class="block text-sm font-medium mb-1"><%= setting.key %></label>
+            <%= f.text_field :value, name: "setting[value]",
+                value: setting.value.is_a?(Hash) ? setting.value.to_json : setting.value.to_s,
+                class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono" %>
+            <% if setting.updated_by_user %>
+              <p class="text-xs text-gray-400 mt-1">
+                Обновлено: <%= setting.updated_at&.strftime("%d.%m.%Y %H:%M") %>
+                (<%= setting.updated_by_user.name || setting.updated_by_user.email %>)
+              </p>
+            <% end %>
+          </div>
+          <%= f.submit "Сохранить", class: "px-4 py-2 bg-gray-900 text-white text-sm rounded-lg cursor-pointer" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

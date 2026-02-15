@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_200006) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -63,6 +63,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_200006) do
     t.jsonb "value", default: {}, null: false
     t.index ["key"], name: "index_app_settings_on_key", unique: true
     t.index ["updated_by_user_id"], name: "index_app_settings_on_updated_by_user_id"
+  end
+
+  create_table "audit_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.bigint "actor_user_id", null: false
+    t.jsonb "after", default: {}
+    t.jsonb "before", default: {}
+    t.datetime "created_at", null: false
+    t.inet "ip"
+    t.bigint "record_id"
+    t.string "record_type"
+    t.index ["action"], name: "index_audit_logs_on_action"
+    t.index ["actor_user_id"], name: "index_audit_logs_on_actor_user_id"
+    t.index ["created_at"], name: "index_audit_logs_on_created_at"
+    t.index ["record_type", "record_id"], name: "index_audit_logs_on_record_type_and_record_id"
   end
 
   create_table "catalog_items", force: :cascade do |t|
@@ -419,6 +434,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_200006) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "app_settings", "users", column: "updated_by_user_id"
+  add_foreign_key "audit_logs", "users", column: "actor_user_id"
   add_foreign_key "catalog_items", "catalog_sections"
   add_foreign_key "design_tags", "designs"
   add_foreign_key "design_tags", "tags"
