@@ -58,6 +58,9 @@ class GenerationPassesController < ApplicationController
     payment.pend!
 
     redirect_to result[:confirmation_url], allow_other_host: true
+  rescue Payments::YookassaClient::PaymentError => e
+    Rails.logger.error("[Payment] GenerationPass: #{e.message}")
+    redirect_to new_generation_pass_path, alert: "Ошибка оплаты. Попробуйте ещё раз."
   end
 
   def confirmed

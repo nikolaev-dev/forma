@@ -102,6 +102,21 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     assert_match order.order_number, response.body
   end
 
+  # --- pay error handling ---
+
+  test "pay redirects back with flash on YookassaClient error" do
+    order = create(:order, :awaiting_payment, total_cents: 259900)
+    create(:order_item, order: order, design: @design, notebook_sku: @sku_base,
+           filling: @filling_grid, unit_price_cents: @sku_base.price_cents)
+
+    Payments::YookassaClient.any_instance.stubs(:create_order_payment)
+      .raises(Payments::YookassaClient::PaymentError.new("HTTP 500"))
+
+    post pay_order_path(order)
+    assert_redirected_to checkout_order_path(order)
+    assert_equal "Ошибка оплаты. Попробуйте ещё раз.", flash[:alert]
+  end
+
   private
 
   def create_draft_order

@@ -78,6 +78,9 @@ class OrdersController < ApplicationController
     )
 
     redirect_to result[:confirmation_url], allow_other_host: true
+  rescue Payments::YookassaClient::PaymentError => e
+    Rails.logger.error("[Payment] Order #{@order.id}: #{e.message}")
+    redirect_to checkout_order_path(@order), alert: "Ошибка оплаты. Попробуйте ещё раз."
   end
 
   # GET /orders/:id/confirmed (S12)

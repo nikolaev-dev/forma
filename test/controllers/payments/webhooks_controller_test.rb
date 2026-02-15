@@ -39,4 +39,16 @@ class Payments::WebhooksControllerTest < ActionDispatch::IntegrationTest
     post payments_yookassa_webhook_path, params: payload, as: :json
     assert_response :ok
   end
+
+  test "yookassa webhook returns 200 even on processing error" do
+    Payments::WebhookProcessor.stubs(:call).raises(StandardError.new("unexpected"))
+
+    payload = {
+      event: "payment.succeeded",
+      object: { id: "pay_error", status: "succeeded" }
+    }
+
+    post payments_yookassa_webhook_path, params: payload, as: :json
+    assert_response :ok
+  end
 end

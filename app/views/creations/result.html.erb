@@ -17,7 +17,7 @@
              data-index="<%= idx %>">
           <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-forma-gray-100">
             <% if variant.preview_image.attached? %>
-              <%= image_tag variant.preview_image, class: "w-full h-full object-cover" %>
+              <%= image_tag variant.preview_medium, class: "w-full h-full object-cover" %>
             <% elsif variant.mockup_image.attached? %>
               <%= image_tag variant.mockup_image, class: "w-full h-full object-cover" %>
             <% else %>

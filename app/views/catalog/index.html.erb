@@ -26,7 +26,7 @@
           <a href="<%= new_creation_path(style: style.slug) %>" class="block" data-turbo-action="advance">
             <div class="aspect-[3/4] rounded-xl overflow-hidden bg-forma-gray-100">
               <% if style.cover_image.attached? %>
-                <%= image_tag style.cover_image, class: "w-full h-full object-cover", loading: "lazy" %>
+                <%= image_tag style.cover_thumb, class: "w-full h-full object-cover", loading: "lazy" %>
               <% else %>
                 <div class="w-full h-full flex items-center justify-center text-forma-gray-300">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
@@ -53,7 +53,7 @@
           <div class="aspect-[3/4] rounded-xl overflow-hidden bg-forma-gray-100">
             <% variant = design.generations.last&.generation_variants&.where(status: "succeeded")&.first %>
             <% if variant&.preview_image&.attached? %>
-              <%= image_tag variant.preview_image, class: "w-full h-full object-cover", loading: "lazy" %>
+              <%= image_tag variant.preview_thumb, class: "w-full h-full object-cover", loading: "lazy" %>
             <% end %>
           </div>
           <p class="mt-1.5 text-xs font-medium truncate"><%= design.title %></p>

@@ -34,4 +34,14 @@ class GenerationVariant < ApplicationRecord
   def fail!(code: nil, message: nil)
     update!(status: "failed", error_code: code, error_message: message)
   end
+
+  def preview_thumb
+    return nil unless preview_image.attached?
+    preview_image.variant(resize_to_limit: [300, 400])
+  end
+
+  def preview_medium
+    return nil unless preview_image.attached?
+    preview_image.variant(resize_to_limit: [600, 800])
+  end
 end

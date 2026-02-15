@@ -15,10 +15,19 @@ module Payments
       new_status = @object["status"]
 
       payment = Payment.find_by(provider_payment_id: provider_payment_id)
-      return unless payment
+
+      unless payment
+        Rails.logger.info("[Webhook] Unknown payment: #{provider_payment_id}")
+        return
+      end
 
       # Idempotency: skip if already in target status
-      return if payment.status == new_status
+      if payment.status == new_status
+        Rails.logger.info("[Webhook] Idempotent skip: #{provider_payment_id} already #{new_status}")
+        return
+      end
+
+      Rails.logger.info("[Webhook] #{provider_payment_id}: #{payment.status} → #{new_status}")
 
       payment.update!(
         status: new_status,

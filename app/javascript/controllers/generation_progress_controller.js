@@ -5,10 +5,12 @@ export default class extends Controller {
   static values = {
     url: String,
     resultUrl: String,
-    interval: { type: Number, default: 2000 }
+    interval: { type: Number, default: 2000 },
+    timeout: { type: Number, default: 180000 }
   }
 
   connect() {
+    this.startedAt = Date.now()
     this.poll()
   }
 
@@ -34,6 +36,12 @@ export default class extends Controller {
       }
     } catch (e) {
       // Network error — continue polling
+    }
+
+    if (Date.now() - this.startedAt > this.timeoutValue) {
+      this.messageTarget.textContent = "Генерация занимает больше времени, чем обычно..."
+      this.showError()
+      return
     }
 
     this.timer = setTimeout(() => this.poll(), this.intervalValue)

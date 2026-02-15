@@ -90,4 +90,48 @@ class Payments::YookassaClientTest < ActiveSupport::TestCase
     assert_equal "refund_456", result[:id]
     assert_equal "succeeded", result[:status]
   end
+
+  # --- Error handling ---
+
+  test "raises PaymentError on HTTP 4xx response" do
+    stub_response = Net::HTTPBadRequest.new("1.1", "400", "Bad Request")
+    stub_response.stubs(:body).returns('{"type":"error","code":"invalid_request","description":"Missing amount"}')
+    stub_response.stubs(:code).returns("400")
+
+    Net::HTTP.any_instance.stubs(:request).returns(stub_response)
+
+    error = assert_raises(Payments::YookassaClient::PaymentError) do
+      @client.create_order_payment(@order, return_url: "https://forma.ru/confirmed")
+    end
+    assert_match "400", error.message
+  end
+
+  test "raises PaymentError on HTTP 5xx response" do
+    stub_response = Net::HTTPInternalServerError.new("1.1", "500", "Internal Server Error")
+    stub_response.stubs(:body).returns('{"type":"error","code":"internal_server_error"}')
+    stub_response.stubs(:code).returns("500")
+
+    Net::HTTP.any_instance.stubs(:request).returns(stub_response)
+
+    error = assert_raises(Payments::YookassaClient::PaymentError) do
+      @client.create_order_payment(@order, return_url: "https://forma.ru/confirmed")
+    end
+    assert_match "500", error.message
+  end
+
+  test "raises PaymentError on network timeout" do
+    Net::HTTP.any_instance.stubs(:request).raises(Net::OpenTimeout.new("execution expired"))
+
+    assert_raises(Payments::YookassaClient::PaymentError) do
+      @client.create_order_payment(@order, return_url: "https://forma.ru/confirmed")
+    end
+  end
+
+  test "raises PaymentError on connection refused" do
+    Net::HTTP.any_instance.stubs(:request).raises(Errno::ECONNREFUSED.new("Connection refused"))
+
+    assert_raises(Payments::YookassaClient::PaymentError) do
+      @client.create_order_payment(@order, return_url: "https://forma.ru/confirmed")
+    end
+  end
 end

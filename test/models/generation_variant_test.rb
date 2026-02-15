@@ -41,4 +41,20 @@ class GenerationVariantTest < ActiveSupport::TestCase
     assert_equal "timeout", variant.error_code
     assert_equal "Provider timeout", variant.error_message
   end
+
+  test "preview_thumb returns variant with resize" do
+    variant = create(:generation_variant, :succeeded)
+    variant.preview_image.attach(
+      io: StringIO.new("fake"),
+      filename: "test.jpg",
+      content_type: "image/jpeg"
+    )
+    result = variant.preview_thumb
+    assert result.respond_to?(:processed)
+  end
+
+  test "preview_thumb returns nil when no image attached" do
+    variant = create(:generation_variant, :succeeded)
+    assert_nil variant.preview_thumb
+  end
 end

@@ -4,6 +4,8 @@ require "uri"
 
 module Payments
   class YookassaClient
+    class PaymentError < StandardError; end
+
     BASE_URL = "https://api.yookassa.ru/v3"
 
     def initialize
@@ -102,8 +104,18 @@ module Payments
     def execute(uri, request)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
+      http.open_timeout = 10
+      http.read_timeout = 30
+
       response = http.request(request)
+
+      unless response.is_a?(Net::HTTPSuccess)
+        raise PaymentError, "YooKassa HTTP #{response.code}: #{response.body}"
+      end
+
       JSON.parse(response.body)
+    rescue Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNREFUSED, Errno::ECONNRESET, SocketError => e
+      raise PaymentError, "YooKassa connection error: #{e.message}"
     end
   end
 end

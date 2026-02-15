@@ -17,4 +17,9 @@ class Style < ApplicationRecord
   scope :ordered, -> { order(:position) }
   scope :popular, -> { order(popularity_score: :desc) }
   scope :editorial, -> { published.where("popularity_score >= ?", 4.0) }
+
+  def cover_thumb
+    return nil unless cover_image.attached?
+    cover_image.variant(resize_to_limit: [300, 400])
+  end
 end

@@ -1,5 +1,6 @@
 class GenerationJob < ApplicationJob
   queue_as :generation
+  retry_on StandardError, wait: :polynomially_longer, attempts: 3
 
   def perform(generation_id)
     generation = ::Generation.find(generation_id)
