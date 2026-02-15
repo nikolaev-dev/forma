@@ -33,14 +33,29 @@ module Payments
 
     def update_payable(payment, new_status)
       payable = payment.payable
-      return unless payable.is_a?(Order)
 
+      case payable
+      when Order
+        update_order(payable, new_status)
+      when GenerationPass
+        update_generation_pass(payable, new_status)
+      end
+    end
+
+    def update_order(order, new_status)
       case new_status
       when "succeeded"
-        payable.pay! if payable.status == "awaiting_payment"
-        OrderFileGenerationJob.perform_later(payable.id)
+        order.pay! if order.status == "awaiting_payment"
+        OrderFileGenerationJob.perform_later(order.id)
       when "canceled"
-        payable.cancel! if payable.status == "awaiting_payment"
+        order.cancel! if order.status == "awaiting_payment"
+      end
+    end
+
+    def update_generation_pass(pass, new_status)
+      case new_status
+      when "canceled"
+        pass.cancel_pass! if pass.status == "active"
       end
     end
   end

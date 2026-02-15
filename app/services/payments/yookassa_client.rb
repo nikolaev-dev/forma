@@ -11,20 +11,30 @@ module Payments
       @secret_key = Rails.application.credentials.dig(:yookassa, :secret_key) || "test_key"
     end
 
-    def create_payment(order, return_url:)
-      idempotence_key = SecureRandom.uuid
+    def create_order_payment(order, return_url:)
+      create_payment(
+        amount_cents: order.total_cents,
+        currency: order.currency,
+        description: "Заказ #{order.order_number}",
+        return_url: return_url,
+        metadata: { order_id: order.id }
+      )
+    end
+
+    def create_payment(amount_cents:, currency: "RUB", description:, return_url:, idempotence_key: nil, metadata: {})
+      idempotence_key ||= SecureRandom.uuid
       body = {
         amount: {
-          value: format("%.2f", order.total_cents / 100.0),
-          currency: order.currency
+          value: format("%.2f", amount_cents / 100.0),
+          currency: currency
         },
         confirmation: {
           type: "redirect",
           return_url: return_url
         },
         capture: true,
-        description: "Заказ #{order.order_number}",
-        metadata: { order_id: order.id }
+        description: description,
+        metadata: metadata
       }
 
       response = post("/payments", body, idempotence_key: idempotence_key)

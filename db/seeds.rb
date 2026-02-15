@@ -8,13 +8,17 @@ puts "Admin user: #{admin.email} (id: #{admin.id})"
 
 # App settings
 settings = {
-  "generation_daily_limit"       => { "value" => 10 },
-  "generation_pass_price_cents"  => { "value" => 10000 },
+  "guest_daily_limit"              => { "value" => 5 },
+  "user_daily_limit"               => { "value" => 30 },
+  "generation_daily_limit"         => { "value" => 10 },
+  "pass_price_cents"               => { "value" => 10000 },
+  "pass_duration_hours"            => { "value" => 24 },
+  "generation_pass_price_cents"    => { "value" => 10000 },
   "generation_pass_duration_hours" => { "value" => 24 },
-  "max_tags_per_generation"      => { "value" => 5 },
-  "notebook_base_price_cents"    => { "value" => 259900 },
-  "notebook_pro_price_cents"     => { "value" => 319900 },
-  "notebook_elite_price_cents"   => { "value" => 899900 }
+  "max_tags_per_generation"        => { "value" => 5 },
+  "notebook_base_price_cents"      => { "value" => 259900 },
+  "notebook_pro_price_cents"       => { "value" => 319900 },
+  "notebook_elite_price_cents"     => { "value" => 899900 }
 }
 
 settings.each do |key, val|

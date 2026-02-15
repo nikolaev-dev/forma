@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_400002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -152,6 +152,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
     t.datetime "updated_at", null: false
     t.index ["filling_type"], name: "index_fillings_on_filling_type"
     t.index ["slug"], name: "index_fillings_on_slug", unique: true
+  end
+
+  create_table "generation_passes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "currency", default: "RUB"
+    t.datetime "ends_at", null: false
+    t.jsonb "fair_use", default: {}
+    t.integer "price_cents", default: 10000, null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id", "status"], name: "index_generation_passes_on_user_id_and_status"
+    t.index ["user_id"], name: "index_generation_passes_on_user_id"
   end
 
   create_table "generation_selections", force: :cascade do |t|
@@ -413,6 +427,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
     t.index ["visibility"], name: "index_tags_on_visibility"
   end
 
+  create_table "usage_counters", force: :cascade do |t|
+    t.bigint "anonymous_identity_id"
+    t.datetime "created_at", null: false
+    t.integer "generations_count", default: 0
+    t.date "period", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["anonymous_identity_id", "period"], name: "idx_usage_counters_anon_period", unique: true, where: "(anonymous_identity_id IS NOT NULL)"
+    t.index ["anonymous_identity_id"], name: "index_usage_counters_on_anonymous_identity_id"
+    t.index ["user_id", "period"], name: "idx_usage_counters_user_period", unique: true, where: "(user_id IS NOT NULL)"
+    t.index ["user_id"], name: "index_usage_counters_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.citext "email"
@@ -441,6 +468,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
   add_foreign_key "designs", "designs", column: "source_design_id"
   add_foreign_key "designs", "styles"
   add_foreign_key "designs", "users"
+  add_foreign_key "generation_passes", "users"
   add_foreign_key "generation_selections", "anonymous_identities"
   add_foreign_key "generation_selections", "generation_variants"
   add_foreign_key "generation_selections", "generations"
@@ -466,4 +494,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_300001) do
   add_foreign_key "tag_relations", "tags", column: "to_tag_id"
   add_foreign_key "tag_synonyms", "tags"
   add_foreign_key "tags", "tag_categories"
+  add_foreign_key "usage_counters", "anonymous_identities"
+  add_foreign_key "usage_counters", "users"
 end

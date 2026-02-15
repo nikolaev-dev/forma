@@ -17,7 +17,7 @@ module Generations
       new(**args).call
     end
 
-    def initialize(user_prompt:, style: nil, tags: [], user: nil, anonymous_identity: nil, source: "create", design: nil)
+    def initialize(user_prompt:, style: nil, tags: [], user: nil, anonymous_identity: nil, source: "create", design: nil, ip: nil)
       @user_prompt = user_prompt
       @style = style
       @tags = tags
@@ -25,9 +25,23 @@ module Generations
       @anonymous_identity = anonymous_identity
       @source = source
       @design = design
+      @ip = ip
     end
 
+    class LimitExceeded < StandardError
+      attr_reader :result
+      def initialize(result)
+        @result = result
+        super("Daily generation limit reached (#{result.used}/#{result.limit})")
+      end
+    end
+
+    class RateLimited < StandardError; end
+
     def call
+      check_limit!
+      check_rate_limit!
+
       generation = ActiveRecord::Base.transaction do
         design = find_or_create_design
         create_prompt(design)
@@ -36,11 +50,28 @@ module Generations
         gen
       end
 
+      LimitChecker.increment!(user: @user, anonymous_identity: @anonymous_identity)
+      RateLimiter.record!(user: @user, anonymous_identity: @anonymous_identity, ip: @ip)
       GenerationJob.perform_later(generation.id)
       generation
     end
 
     private
+
+    def check_limit!
+      result = LimitChecker.call(user: @user, anonymous_identity: @anonymous_identity)
+      raise LimitExceeded, result unless result.allowed?
+    end
+
+    def check_rate_limit!
+      result = RateLimiter.check(user: @user, anonymous_identity: @anonymous_identity)
+      raise RateLimited, "Too many requests per minute" unless result[:allowed]
+
+      if @ip
+        ip_result = RateLimiter.check_ip(@ip)
+        raise RateLimited, "Too many requests from this IP" unless ip_result[:allowed]
+      end
+    end
 
     def find_or_create_design
       return @design if @design

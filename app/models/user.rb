@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include Hashid::Rails
 
   has_many :oauth_identities, dependent: :destroy
+  has_many :generation_passes, dependent: :destroy
 
   enum :role, {
     user: "user",

@@ -273,14 +273,14 @@
 
 ## Этап 6. Лимиты и монетизация генераций
 
-- [ ] Миграция: generation_passes, usage_counters
-- [ ] Модели GenerationPass, UsageCounter
-- [ ] Сервис: проверка лимита перед генерацией
-- [ ] Инкремент счетчика при каждой генерации
-- [ ] Экран "Лимит исчерпан" (L1)
-- [ ] Покупка безлимита: оплата через ЮKassa (payable_type: "GenerationPass")
-- [ ] Rate limiting (Redis)
-- [ ] Антиабуз: IP + fingerprint для гостей
+- [x] Миграция: generation_passes, usage_counters
+- [x] Модели GenerationPass, UsageCounter
+- [x] Сервис: проверка лимита перед генерацией
+- [x] Инкремент счетчика при каждой генерации
+- [x] Экран "Лимит исчерпан" (L1)
+- [x] Покупка безлимита: оплата через ЮKassa (payable_type: "GenerationPass")
+- [x] Rate limiting (Redis)
+- [x] Антиабуз: IP + fingerprint для гостей
 
 **Результат:** Работают лимиты, можно купить безлимит за 100 ₽.
 

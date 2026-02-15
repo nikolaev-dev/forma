@@ -64,7 +64,7 @@ class OrdersController < ApplicationController
   # POST /orders/:id/pay
   def pay
     client = Payments::YookassaClient.new
-    result = client.create_payment(@order, return_url: confirmed_order_url(@order))
+    result = client.create_order_payment(@order, return_url: confirmed_order_url(@order))
 
     @order.payments.create!(
       provider: "yookassa",

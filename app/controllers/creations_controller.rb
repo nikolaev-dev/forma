@@ -20,13 +20,22 @@ class CreationsController < ApplicationController
     style = Style.published.find_by(slug: creation_params[:style_slug]) if creation_params[:style_slug].present?
     tags = creation_params[:tag_ids].present? ? Tag.available.where(id: creation_params[:tag_ids]) : []
 
-    generation = Generations::Pipeline.call(
-      user_prompt: user_prompt,
-      style: style,
-      tags: tags.to_a,
-      user: current_user,
-      anonymous_identity: current_user ? nil : current_anonymous_identity
-    )
+    begin
+      generation = Generations::Pipeline.call(
+        user_prompt: user_prompt,
+        style: style,
+        tags: tags.to_a,
+        user: current_user,
+        anonymous_identity: current_user ? nil : current_anonymous_identity,
+        ip: request.remote_ip
+      )
+    rescue Generations::Pipeline::LimitExceeded
+      redirect_to limit_reached_generation_passes_path, alert: "Дневной лимит генераций исчерпан"
+      return
+    rescue Generations::Pipeline::RateLimited
+      redirect_to new_creation_path, alert: "Слишком много запросов. Подождите минуту."
+      return
+    end
 
     redirect_to progress_creation_path(generation.design)
   end

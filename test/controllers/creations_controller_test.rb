@@ -41,6 +41,9 @@ class CreationsControllerTest < ActionDispatch::IntegrationTest
 
   test "create launches generation and redirects to progress" do
     GenerationJob.stubs(:perform_later)
+    Generations::RateLimiter.stubs(:check).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:check_ip).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:record!)
 
     post creations_path, params: {
       creation: {
@@ -70,6 +73,9 @@ class CreationsControllerTest < ActionDispatch::IntegrationTest
 
   test "create works without style" do
     GenerationJob.stubs(:perform_later)
+    Generations::RateLimiter.stubs(:check).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:check_ip).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:record!)
 
     post creations_path, params: {
       creation: {
@@ -82,6 +88,9 @@ class CreationsControllerTest < ActionDispatch::IntegrationTest
 
   test "create works without tags" do
     GenerationJob.stubs(:perform_later)
+    Generations::RateLimiter.stubs(:check).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:check_ip).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:record!)
 
     post creations_path, params: {
       creation: {

@@ -7,7 +7,7 @@ class Payments::YookassaClientTest < ActiveSupport::TestCase
     @order = create(:order, :awaiting_payment, total_cents: 259900)
   end
 
-  test "create_payment sends POST to YooKassa and returns payment data" do
+  test "create_order_payment sends POST to YooKassa and returns payment data" do
     response_body = {
       "id" => "pay_123",
       "status" => "pending",
@@ -20,11 +20,34 @@ class Payments::YookassaClientTest < ActiveSupport::TestCase
 
     Net::HTTP.any_instance.stubs(:request).returns(stub_response)
 
-    result = @client.create_payment(@order, return_url: "https://forma.ru/orders/1/confirmed")
+    result = @client.create_order_payment(@order, return_url: "https://forma.ru/orders/1/confirmed")
 
     assert_equal "pay_123", result[:provider_payment_id]
     assert_equal "pending", result[:status]
     assert_equal "https://yookassa.ru/pay/123", result[:confirmation_url]
+  end
+
+  test "create_payment with keyword args sends POST to YooKassa" do
+    response_body = {
+      "id" => "pay_456",
+      "status" => "pending",
+      "confirmation" => { "confirmation_url" => "https://yookassa.ru/pay/456" }
+    }.to_json
+
+    stub_response = Net::HTTPOK.new("1.1", "200", "OK")
+    stub_response.stubs(:body).returns(response_body)
+    stub_response.stubs(:content_type).returns("application/json")
+
+    Net::HTTP.any_instance.stubs(:request).returns(stub_response)
+
+    result = @client.create_payment(
+      amount_cents: 10000,
+      description: "Безлимит генераций",
+      return_url: "https://forma.ru/passes/1/confirmed"
+    )
+
+    assert_equal "pay_456", result[:provider_payment_id]
+    assert_equal "https://yookassa.ru/pay/456", result[:confirmation_url]
   end
 
   test "get_payment sends GET to YooKassa" do

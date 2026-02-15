@@ -75,6 +75,33 @@ class Payments::WebhookProcessorTest < ActiveSupport::TestCase
     assert_equal "succeeded", payment.reload.status
   end
 
+  test "processes canceled webhook for generation_pass" do
+    user = create(:user)
+    pass = create(:generation_pass, user: user, status: "active")
+    payment = create(:payment,
+      payable: pass,
+      provider_payment_id: "pay_pass_123",
+      status: "pending",
+      amount_cents: 10000
+    )
+
+    payload = {
+      "event" => "payment.canceled",
+      "object" => {
+        "id" => "pay_pass_123",
+        "status" => "canceled"
+      }
+    }
+
+    Payments::WebhookProcessor.call(payload)
+
+    payment.reload
+    pass.reload
+
+    assert_equal "canceled", payment.status
+    assert_equal "canceled", pass.status
+  end
+
   test "ignores unknown provider_payment_id" do
     payload = {
       "event" => "payment.succeeded",

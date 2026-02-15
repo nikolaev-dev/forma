@@ -29,6 +29,16 @@ Rails.application.routes.draw do
     end
   end
 
+  # Generation passes (безлимит)
+  resources :generation_passes, only: [:new, :create] do
+    collection do
+      get :limit_reached   # L1: экран "Лимит исчерпан"
+    end
+    member do
+      get :confirmed       # после оплаты
+    end
+  end
+
   # YooKassa webhook
   post "payments/yookassa/webhook", to: "payments/webhooks#yookassa", as: :payments_yookassa_webhook
 

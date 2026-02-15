@@ -2,8 +2,11 @@ require "test_helper"
 
 class Generations::PipelineTest < ActiveSupport::TestCase
   setup do
-    # Stub GenerationJob to avoid Redis connection
+    # Stub GenerationJob and RateLimiter to avoid Redis connection
     GenerationJob.stubs(:perform_later).returns(true)
+    Generations::RateLimiter.stubs(:check).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:check_ip).returns({ allowed: true })
+    Generations::RateLimiter.stubs(:record!)
 
     @user = create(:user)
     @style = create(:style, generation_preset: { "style_prompt" => "test prompt" })
@@ -76,5 +79,27 @@ class Generations::PipelineTest < ActiveSupport::TestCase
     )
 
     assert_equal @tags.map(&:slug).sort, gen.tags_snapshot["tags"].sort
+  end
+
+  test "raises LimitExceeded when daily limit reached" do
+    AppSetting.set("user_daily_limit", { "value" => 2 })
+    create(:usage_counter, user: @user, generations_count: 2)
+
+    assert_raises(Generations::Pipeline::LimitExceeded) do
+      Generations::Pipeline.call(
+        user_prompt: "блокнот",
+        user: @user
+      )
+    end
+  end
+
+  test "increments usage counter on successful generation" do
+    gen = Generations::Pipeline.call(
+      user_prompt: "блокнот",
+      user: @user
+    )
+
+    counter = UsageCounter.find_by(user: @user, period: Date.current)
+    assert_equal 1, counter.generations_count
   end
 end

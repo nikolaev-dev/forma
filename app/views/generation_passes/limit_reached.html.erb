@@ -1,0 +1,34 @@
+<div class="container mx-auto px-4 py-12 max-w-lg text-center">
+  <h1 class="text-2xl font-bold mb-4">Лимит исчерпан</h1>
+
+  <p class="text-gray-600 mb-6">
+    Вы использовали все доступные генерации на сегодня.
+    Попробуйте завтра или получите безлимитный доступ.
+  </p>
+
+  <% if @has_active_pass %>
+    <p class="text-green-600 font-medium mb-4">У вас есть активный безлимит!</p>
+    <%= link_to "Создать дизайн", new_creation_path,
+        class: "inline-block bg-black text-white px-6 py-3 rounded-lg font-medium" %>
+  <% elsif current_user %>
+    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+      <h2 class="text-lg font-semibold mb-2">Безлимит на 24 часа</h2>
+      <p class="text-3xl font-bold mb-2">100 &#8381;</p>
+      <p class="text-gray-500 text-sm mb-4">Генерируйте без ограничений</p>
+      <%= link_to "Купить безлимит", new_generation_pass_path,
+          class: "inline-block bg-black text-white px-6 py-3 rounded-lg font-medium w-full" %>
+    </div>
+  <% else %>
+    <div class="space-y-4">
+      <p class="text-gray-500 text-sm">
+        Войдите в аккаунт, чтобы получить больше генераций или купить безлимит.
+      </p>
+      <%= link_to "Войти", root_path,
+          class: "inline-block bg-black text-white px-6 py-3 rounded-lg font-medium" %>
+    </div>
+  <% end %>
+
+  <div class="mt-8">
+    <%= link_to "Вернуться в каталог", root_path, class: "text-gray-500 underline" %>
+  </div>
+</div>
