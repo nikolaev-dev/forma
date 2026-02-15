@@ -16,6 +16,18 @@ Rails.application.routes.draw do
     end
   end
 
+  # Designs (S7: public design page)
+  resources :designs, only: [:show] do
+    member do
+      post :remix
+      post :toggle_favorite
+      post :rate
+    end
+  end
+
+  # Favorites (S14)
+  resources :favorites, only: [:index]
+
   # Orders (S8 → S12)
   resources :orders, only: [ :new, :show, :update ] do
     member do

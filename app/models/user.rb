@@ -3,6 +3,9 @@ class User < ApplicationRecord
 
   has_many :oauth_identities, dependent: :destroy
   has_many :generation_passes, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_designs, through: :favorites, source: :design
+  has_many :design_ratings, dependent: :destroy
 
   enum :role, {
     user: "user",

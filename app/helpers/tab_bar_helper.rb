@@ -3,7 +3,7 @@ module TabBarHelper
     { name: "Каталог",   path: :root_path,          icon: :catalog,   active: true },
     { name: "Создать",   path: :new_creation_path,   icon: :create,    active: true },
     { name: "Поиск",     path: nil,                  icon: :search,    active: false },
-    { name: "Избранное", path: nil,                  icon: :favorites, active: false },
+    { name: "Избранное", path: :favorites_path,        icon: :favorites, active: true },
     { name: "Профиль",   path: nil,                  icon: :profile,   active: false }
   ].freeze
 

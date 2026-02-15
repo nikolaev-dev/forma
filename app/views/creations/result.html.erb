@@ -65,18 +65,18 @@
 
   <%# Панель поделиться / сохранить %>
   <div class="px-4 mt-6 flex justify-center gap-6 text-forma-gray-500">
-    <button class="flex items-center gap-1.5 text-xs">
+    <button class="flex items-center gap-1.5 text-xs"
+            onclick="if(navigator.share){navigator.share({title:'<%= j @design.title %>',url:'<%= design_url(@design.slug || @design.hashid) %>'})}else{navigator.clipboard.writeText('<%= design_url(@design.slug || @design.hashid) %>')}">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
         <path d="M13 4.5a2.5 2.5 0 1 1 .702 1.737L6.97 9.604a2.507 2.507 0 0 1 0 .798l6.733 3.366a2.5 2.5 0 1 1-.671 1.341l-6.733-3.366a2.5 2.5 0 1 1 0-3.48l6.733-3.366A2.52 2.52 0 0 1 13 4.5Z" />
       </svg>
       Поделиться
     </button>
-    <button class="flex items-center gap-1.5 text-xs">
+    <%= link_to design_path(@design.slug || @design.hashid), class: "flex items-center gap-1.5 text-xs" do %>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
-        <path d="M10 2a.75.75 0 0 1 .75.75v5.59l1.95-2.1a.75.75 0 1 1 1.1 1.02l-3.25 3.5a.75.75 0 0 1-1.1 0L6.2 7.26a.75.75 0 1 1 1.1-1.02l1.95 2.1V2.75A.75.75 0 0 1 10 2Z" />
-        <path d="M5.273 4.5a1.25 1.25 0 0 0-1.205.918l-1.523 5.52c-.006.02-.01.041-.015.062H6a1 1 0 0 1 .894.553l.448.894a1 1 0 0 0 .894.553h3.438a1 1 0 0 0 .86-.49l.606-1.02A1 1 0 0 1 14 11h3.47a1.318 1.318 0 0 0-.015-.062l-1.523-5.52a1.25 1.25 0 0 0-1.205-.918h-.977a.75.75 0 0 1 0-1.5h.977a2.75 2.75 0 0 1 2.651 2.019l1.523 5.52c.066.239.099.485.099.732V15a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3.73c0-.246.033-.492.099-.73l1.523-5.521A2.75 2.75 0 0 1 5.273 3h.977a.75.75 0 0 1 0 1.5h-.977Z" />
+        <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z" clip-rule="evenodd" />
       </svg>
-      Сохранить
-    </button>
+      Страница дизайна
+    <% end %>
   </div>
 </div>

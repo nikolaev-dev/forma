@@ -11,6 +11,9 @@ class Design < ApplicationRecord
   has_many :generations, dependent: :destroy
   has_one :prompt, dependent: :destroy
 
+  has_many :favorites, dependent: :destroy
+  has_many :design_ratings, dependent: :destroy
+
   has_one_attached :hero_image
   has_one_attached :share_image
 

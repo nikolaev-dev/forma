@@ -1,0 +1,133 @@
+<% content_for(:title) { "#{@design.title} — FORMA" } %>
+
+<% content_for(:head) do %>
+  <meta property="og:title" content="<%= @design.title %> — FORMA">
+  <meta property="og:description" content="<%= design_og_description(@design) %>">
+  <% if @variants.any? && @variants.first.preview_image.attached? %>
+    <meta property="og:image" content="<%= url_for(@variants.first.preview_image) %>">
+  <% end %>
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="<%= request.original_url %>">
+  <meta name="twitter:card" content="summary_large_image">
+<% end %>
+
+<div class="pt-4 pb-8">
+  <%# Header %>
+  <div class="px-4">
+    <%= link_to root_path, class: "text-forma-gray-400 text-sm" do %>
+      &larr; Каталог
+    <% end %>
+  </div>
+
+  <%# Gallery %>
+  <div class="mt-4">
+    <% if @variants.any? %>
+      <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-4 scrollbar-hide">
+        <% @variants.each do |variant| %>
+          <div class="flex-shrink-0 w-[calc(100vw-3rem)] snap-center">
+            <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-forma-gray-100">
+              <% if variant.preview_image.attached? %>
+                <%= image_tag variant.preview_image, class: "w-full h-full object-cover" %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center text-forma-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-16"><path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" /></svg>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Title + tags %>
+  <div class="px-4 mt-2">
+    <h1 class="text-xl font-bold"><%= @design.title %></h1>
+
+    <% if @design.tags.any? %>
+      <div class="flex flex-wrap gap-1.5 mt-2">
+        <% @design.tags.where(visibility: "public").each do |tag| %>
+          <span class="inline-block px-2.5 py-1 text-xs bg-forma-gray-100 rounded-full"><%= tag.name %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @average_rating %>
+      <div class="mt-2 text-sm text-forma-gray-500">
+        <%= "%.1f" % @average_rating %> / 5
+      </div>
+    <% end %>
+  </div>
+
+  <%# Action buttons %>
+  <div class="px-4 mt-6 space-y-3">
+    <%= link_to "Заказать", new_order_path(design_id: @design.id),
+        class: "block w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black text-center" %>
+
+    <%= button_to "Ремикснуть", remix_design_path(@design.slug || @design.hashid),
+        params: { user_prompt: @design.base_prompt },
+        class: "w-full py-3.5 rounded-xl text-sm font-semibold text-forma-black bg-forma-gray-100 text-center" %>
+  </div>
+
+  <%# Share / Favorite bar %>
+  <div class="px-4 mt-6 flex justify-center gap-6 text-forma-gray-500">
+    <button class="flex items-center gap-1.5 text-xs"
+            onclick="if(navigator.share){navigator.share({title:'<%= j @design.title %>',url:window.location.href})}else{navigator.clipboard.writeText(window.location.href)}">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+        <path d="M13 4.5a2.5 2.5 0 1 1 .702 1.737L6.97 9.604a2.507 2.507 0 0 1 0 .798l6.733 3.366a2.5 2.5 0 1 1-.671 1.341l-6.733-3.366a2.5 2.5 0 1 1 0-3.48l6.733-3.366A2.52 2.52 0 0 1 13 4.5Z" />
+      </svg>
+      Поделиться
+    </button>
+
+    <% if current_user %>
+      <%= button_to @is_favorited ? "В избранном" : "Сохранить",
+          toggle_favorite_design_path(@design.slug || @design.hashid),
+          method: :post,
+          class: "flex items-center gap-1.5 text-xs #{@is_favorited ? 'text-red-500' : ''}" %>
+    <% else %>
+      <span class="flex items-center gap-1.5 text-xs">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+          <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.723.723 0 0 1-.692 0l-.003-.002Z" />
+        </svg>
+        Сохранить
+      </span>
+    <% end %>
+  </div>
+
+  <%# FORMA DNA %>
+  <div class="px-4 mt-8">
+    <div class="bg-forma-gray-50 rounded-xl p-4">
+      <h3 class="text-xs font-semibold text-forma-gray-400 uppercase tracking-wider">FORMA DNA</h3>
+      <div class="mt-2 text-sm text-forma-gray-600 space-y-1">
+        <% if @design.source_design %>
+          <p>Создан из: <%= link_to @design.source_design.title, design_path(@design.source_design.slug || @design.source_design.hashid), class: "underline" %></p>
+        <% end %>
+        <% if @design.style %>
+          <p>Стиль: <%= @design.style.name %></p>
+        <% end %>
+        <p>Дата: <%= l(@design.created_at.to_date, format: :long) %></p>
+        <p>ID: <%= @design.hashid %></p>
+      </div>
+    </div>
+  </div>
+
+  <%# Remixes block %>
+  <% if @remixes.any? %>
+    <div class="mt-8">
+      <h2 class="px-4 text-lg font-semibold">Ремиксы</h2>
+      <div class="flex gap-3 overflow-x-auto px-4 mt-3 pb-2 snap-x snap-mandatory scrollbar-hide">
+        <% @remixes.each do |remix| %>
+          <a href="<%= design_path(remix.slug || remix.hashid) %>" class="flex-shrink-0 w-32">
+            <div class="aspect-[3/4] rounded-xl overflow-hidden bg-forma-gray-100">
+              <% remix_variant = remix.generations.last&.generation_variants&.where(status: "succeeded")&.first %>
+              <% if remix_variant&.preview_image&.attached? %>
+                <%= image_tag remix_variant.preview_image, class: "w-full h-full object-cover", loading: "lazy" %>
+              <% end %>
+            </div>
+            <p class="mt-1 text-xs truncate"><%= remix.title %></p>
+          </a>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

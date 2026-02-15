@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_400002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -107,6 +107,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_400002) do
     t.index ["slug"], name: "index_catalog_sections_on_slug", unique: true
   end
 
+  create_table "design_ratings", force: :cascade do |t|
+    t.string "comment"
+    t.datetime "created_at", null: false
+    t.bigint "design_id", null: false
+    t.integer "score", null: false
+    t.string "source", default: "user", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["design_id", "user_id"], name: "idx_design_ratings_user_unique", unique: true, where: "((source)::text = 'user'::text)"
+    t.index ["design_id"], name: "index_design_ratings_on_design_id"
+    t.index ["user_id"], name: "index_design_ratings_on_user_id"
+  end
+
   create_table "design_tags", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "design_id", null: false
@@ -140,6 +153,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_400002) do
     t.index ["style_id"], name: "index_designs_on_style_id"
     t.index ["user_id"], name: "index_designs_on_user_id"
     t.index ["visibility"], name: "index_designs_on_visibility"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "design_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["design_id"], name: "index_favorites_on_design_id"
+    t.index ["user_id", "design_id"], name: "index_favorites_on_user_id_and_design_id", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "fillings", force: :cascade do |t|
@@ -463,11 +485,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_400002) do
   add_foreign_key "app_settings", "users", column: "updated_by_user_id"
   add_foreign_key "audit_logs", "users", column: "actor_user_id"
   add_foreign_key "catalog_items", "catalog_sections"
+  add_foreign_key "design_ratings", "designs"
+  add_foreign_key "design_ratings", "users"
   add_foreign_key "design_tags", "designs"
   add_foreign_key "design_tags", "tags"
   add_foreign_key "designs", "designs", column: "source_design_id"
   add_foreign_key "designs", "styles"
   add_foreign_key "designs", "users"
+  add_foreign_key "favorites", "designs"
+  add_foreign_key "favorites", "users"
   add_foreign_key "generation_passes", "users"
   add_foreign_key "generation_selections", "anonymous_identities"
   add_foreign_key "generation_selections", "generation_variants"
