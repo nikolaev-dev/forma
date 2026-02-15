@@ -57,6 +57,9 @@ gem "hashid-rails"
 # --- FORMA: Storage ---
 gem "aws-sdk-s3", require: false
 
+# --- FORMA: CSV (extracted from stdlib in Ruby 3.4) ---
+gem "csv"
+
 # --- FORMA: PDF & Barcodes ---
 gem "prawn"
 gem "prawn-table"
@@ -78,6 +81,7 @@ group :development, :test do
 
   gem "factory_bot_rails"
   gem "faker"
+  gem "mocha"
 end
 
 group :development do

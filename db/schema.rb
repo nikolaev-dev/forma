@@ -10,12 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_000008) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
   enable_extension "unaccent"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "anonymous_identities", force: :cascade do |t|
     t.string "anon_token_hash", null: false
@@ -64,6 +92,96 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_000008) do
     t.index ["slug"], name: "index_catalog_sections_on_slug", unique: true
   end
 
+  create_table "design_tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "design_id", null: false
+    t.string "source", default: "user", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["design_id", "tag_id"], name: "index_design_tags_on_design_id_and_tag_id", unique: true
+    t.index ["design_id"], name: "index_design_tags_on_design_id"
+    t.index ["tag_id"], name: "index_design_tags_on_tag_id"
+  end
+
+  create_table "designs", force: :cascade do |t|
+    t.text "base_prompt"
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}
+    t.string "moderation_status", default: "ok", null: false
+    t.decimal "popularity_score", precision: 10, scale: 4, default: "0.0"
+    t.virtual "search_vector", type: :tsvector, as: "(setweight(to_tsvector('russian'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('russian'::regconfig, COALESCE(base_prompt, ''::text)), 'B'::\"char\"))", stored: true
+    t.string "slug"
+    t.bigint "source_design_id"
+    t.bigint "style_id"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.string "visibility", default: "private", null: false
+    t.index ["moderation_status"], name: "index_designs_on_moderation_status"
+    t.index ["popularity_score"], name: "index_designs_on_popularity_score"
+    t.index ["search_vector"], name: "index_designs_on_search_vector", using: :gin
+    t.index ["slug"], name: "index_designs_on_slug", unique: true, where: "(slug IS NOT NULL)"
+    t.index ["source_design_id"], name: "index_designs_on_source_design_id"
+    t.index ["style_id"], name: "index_designs_on_style_id"
+    t.index ["user_id"], name: "index_designs_on_user_id"
+    t.index ["visibility"], name: "index_designs_on_visibility"
+  end
+
+  create_table "generation_selections", force: :cascade do |t|
+    t.bigint "anonymous_identity_id"
+    t.datetime "created_at", null: false
+    t.bigint "generation_id", null: false
+    t.bigint "generation_variant_id", null: false
+    t.bigint "user_id"
+    t.index ["anonymous_identity_id"], name: "index_generation_selections_on_anonymous_identity_id"
+    t.index ["generation_id"], name: "index_generation_selections_on_generation_id"
+    t.index ["generation_variant_id"], name: "index_generation_selections_on_generation_variant_id"
+    t.index ["user_id"], name: "index_generation_selections_on_user_id"
+  end
+
+  create_table "generation_variants", force: :cascade do |t|
+    t.text "composed_prompt", null: false
+    t.datetime "created_at", null: false
+    t.string "error_code"
+    t.text "error_message"
+    t.bigint "generation_id", null: false
+    t.string "kind", null: false
+    t.string "mutation_summary"
+    t.jsonb "mutation_tags_added", default: []
+    t.jsonb "mutation_tags_removed", default: []
+    t.string "provider_job_id"
+    t.jsonb "provider_metadata", default: {}
+    t.bigint "seed"
+    t.string "status", default: "created", null: false
+    t.datetime "updated_at", null: false
+    t.index ["generation_id", "kind"], name: "index_generation_variants_on_generation_id_and_kind", unique: true
+    t.index ["generation_id"], name: "index_generation_variants_on_generation_id"
+    t.index ["provider_job_id"], name: "index_generation_variants_on_provider_job_id"
+    t.index ["status"], name: "index_generation_variants_on_status"
+  end
+
+  create_table "generations", force: :cascade do |t|
+    t.bigint "anonymous_identity_id"
+    t.datetime "created_at", null: false
+    t.bigint "design_id", null: false
+    t.string "error_code"
+    t.text "error_message"
+    t.datetime "finished_at"
+    t.jsonb "preset_snapshot", default: {}
+    t.string "provider", null: false
+    t.string "source", default: "create", null: false
+    t.datetime "started_at"
+    t.string "status", default: "created", null: false
+    t.jsonb "tags_snapshot", default: {}
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["anonymous_identity_id"], name: "index_generations_on_anonymous_identity_id"
+    t.index ["design_id"], name: "index_generations_on_design_id"
+    t.index ["source"], name: "index_generations_on_source"
+    t.index ["status"], name: "index_generations_on_status"
+    t.index ["user_id"], name: "index_generations_on_user_id"
+  end
+
   create_table "oauth_identities", force: :cascade do |t|
     t.text "access_token"
     t.datetime "created_at", null: false
@@ -77,6 +195,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_000008) do
     t.bigint "user_id", null: false
     t.index ["provider", "uid"], name: "index_oauth_identities_on_provider_and_uid", unique: true
     t.index ["user_id"], name: "index_oauth_identities_on_user_id"
+  end
+
+  create_table "prompt_versions", force: :cascade do |t|
+    t.string "change_reason"
+    t.bigint "changed_by_user_id"
+    t.datetime "created_at", null: false
+    t.string "diff_summary"
+    t.jsonb "metadata", default: {}
+    t.bigint "prompt_id", null: false
+    t.text "text", null: false
+    t.index ["changed_by_user_id"], name: "index_prompt_versions_on_changed_by_user_id"
+    t.index ["prompt_id"], name: "index_prompt_versions_on_prompt_id"
+  end
+
+  create_table "prompts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "current_text", null: false
+    t.bigint "design_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["design_id"], name: "index_prompts_on_design_id"
   end
 
   create_table "style_tags", force: :cascade do |t|
@@ -177,9 +315,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_000008) do
     t.index ["status"], name: "index_users_on_status"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "app_settings", "users", column: "updated_by_user_id"
   add_foreign_key "catalog_items", "catalog_sections"
+  add_foreign_key "design_tags", "designs"
+  add_foreign_key "design_tags", "tags"
+  add_foreign_key "designs", "designs", column: "source_design_id"
+  add_foreign_key "designs", "styles"
+  add_foreign_key "designs", "users"
+  add_foreign_key "generation_selections", "anonymous_identities"
+  add_foreign_key "generation_selections", "generation_variants"
+  add_foreign_key "generation_selections", "generations"
+  add_foreign_key "generation_selections", "users"
+  add_foreign_key "generation_variants", "generations"
+  add_foreign_key "generations", "anonymous_identities"
+  add_foreign_key "generations", "designs"
+  add_foreign_key "generations", "users"
   add_foreign_key "oauth_identities", "users"
+  add_foreign_key "prompt_versions", "prompts"
+  add_foreign_key "prompt_versions", "users", column: "changed_by_user_id"
+  add_foreign_key "prompts", "designs"
   add_foreign_key "style_tags", "styles"
   add_foreign_key "style_tags", "tags"
   add_foreign_key "tag_relations", "tags", column: "from_tag_id"

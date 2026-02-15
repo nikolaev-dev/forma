@@ -28,6 +28,9 @@ Rails.application.configure do
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 
+  # Use inline job processing in tests (no Redis/Sidekiq dependency)
+  config.active_job.queue_adapter = :test
+
   # Store uploaded files on the local file system in a temporary directory.
   config.active_storage.service = :test
 
@@ -50,4 +53,9 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Active Record Encryption keys for test environment
+  config.active_record.encryption.primary_key = "test-primary-key-for-encryption"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key-encrypt"
+  config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt-value"
 end
