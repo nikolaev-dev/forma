@@ -16,6 +16,22 @@ Rails.application.routes.draw do
     end
   end
 
+  # Orders (S8 → S12)
+  resources :orders, only: [ :new, :show, :update ] do
+    member do
+      get :filling       # S8: выбор наполнения
+      patch :set_filling # S8: сохранить наполнение
+      get :sku           # S9: выбор комплектации
+      patch :set_sku     # S9: сохранить SKU
+      get :checkout      # S10: форма оформления
+      post :pay          # → redirect to YooKassa
+      get :confirmed     # S12: заказ принят
+    end
+  end
+
+  # YooKassa webhook
+  post "payments/yookassa/webhook", to: "payments/webhooks#yookassa", as: :payments_yookassa_webhook
+
   # API
   namespace :api do
     get "catalog/styles",   to: "catalog#styles"

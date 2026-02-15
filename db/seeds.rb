@@ -379,3 +379,42 @@ if demo_style
 end
 
 puts "\n✓ Visual demo data complete!"
+
+# =============================================================================
+# FILLINGS — наполнения блокнота
+# =============================================================================
+fillings_data = [
+  { name: "Клетка",   slug: "grid",  filling_type: "grid" },
+  { name: "Линейка",  slug: "ruled", filling_type: "ruled" },
+  { name: "Точки",    slug: "dot",   filling_type: "dot" },
+  { name: "Пустые",   slug: "blank", filling_type: "blank" }
+]
+
+fillings_data.each do |data|
+  Filling.find_or_create_by!(slug: data[:slug]) do |f|
+    f.name = data[:name]
+    f.filling_type = data[:filling_type]
+  end
+end
+puts "Fillings: #{Filling.count} records"
+
+# =============================================================================
+# NOTEBOOK SKUs — комплектации
+# =============================================================================
+skus_data = [
+  { code: "base",  name: "FORMA Base",  price_cents: 259900,
+    specs: { cover: "Софт-тач ламинация", pages: "80 листов", format: "A5" } },
+  { code: "pro",   name: "FORMA Pro",   price_cents: 319900,
+    specs: { cover: "Софт-тач + тиснение", pages: "120 листов", format: "A5", extras: "Ленточка-закладка" } },
+  { code: "elite", name: "FORMA Elite", price_cents: 899900,
+    specs: { cover: "Итальянская кожа", pages: "160 листов", format: "A5", extras: "Закладка, резинка, DNA Card" } }
+]
+
+skus_data.each do |data|
+  NotebookSku.find_or_create_by!(code: data[:code]) do |s|
+    s.name = data[:name]
+    s.price_cents = data[:price_cents]
+    s.specs = data[:specs]
+  end
+end
+puts "Notebook SKUs: #{NotebookSku.count} records"

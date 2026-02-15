@@ -55,9 +55,8 @@
 
   <%# Кнопки действий %>
   <div class="px-4 mt-6 space-y-3">
-    <button class="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black">
-      Выбрать этот дизайн
-    </button>
+    <%= link_to "Выбрать этот дизайн", new_order_path(design_id: @design.id),
+        class: "block w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black text-center" %>
     <a href="<%= new_creation_path(style: @design.style&.slug) %>"
        class="block w-full py-3.5 rounded-xl text-sm font-semibold text-forma-black bg-forma-gray-100 text-center">
       Докрутить

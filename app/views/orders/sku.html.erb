@@ -1,0 +1,26 @@
+<% content_for(:title) { "Комплектация — FORMA" } %>
+
+<div class="pt-8 pb-4">
+  <div class="px-4">
+    <h1 class="text-xl font-bold">Выберите комплектацию</h1>
+    <p class="text-sm text-forma-gray-500 mt-1">Материалы и отделка</p>
+  </div>
+
+  <div class="px-4 mt-6 space-y-3">
+    <% @skus.each do |sku| %>
+      <%= link_to set_sku_order_path(@order, notebook_sku_id: sku.id),
+                  data: { turbo_method: :patch },
+                  class: "block rounded-xl border p-4 hover:border-forma-black transition-colors #{@order_item&.notebook_sku_id == sku.id ? 'border-forma-black' : 'border-forma-gray-200'}" do %>
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="font-semibold"><%= sku.name %></p>
+            <% if sku.specs.present? %>
+              <p class="text-xs text-forma-gray-500 mt-1"><%= sku.specs.values.join(" / ") %></p>
+            <% end %>
+          </div>
+          <p class="text-lg font-bold"><%= number_to_currency(sku.price_cents / 100.0, unit: "\u20BD", format: "%n %u") %></p>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

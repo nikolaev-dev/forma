@@ -1,0 +1,61 @@
+<% content_for(:title) { "Заказ #{@order.order_number} — FORMA" } %>
+
+<div class="pt-8 pb-4">
+  <div class="px-4">
+    <h1 class="text-xl font-bold">Заказ <%= @order.order_number %></h1>
+  </div>
+
+  <%# Статус %>
+  <div class="px-4 mt-4">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                <%= order_status_class(@order.status) %>">
+      <%= order_status_label(@order.status) %>
+    </div>
+  </div>
+
+  <%# Детали %>
+  <div class="px-4 mt-6 space-y-3">
+    <% if @order.customer_name.present? %>
+      <div class="flex justify-between text-sm">
+        <span class="text-forma-gray-500">Имя</span>
+        <span><%= @order.customer_name %></span>
+      </div>
+    <% end %>
+    <% if @order.customer_email.present? %>
+      <div class="flex justify-between text-sm">
+        <span class="text-forma-gray-500">Email</span>
+        <span><%= @order.customer_email %></span>
+      </div>
+    <% end %>
+    <% if @order.customer_phone.present? %>
+      <div class="flex justify-between text-sm">
+        <span class="text-forma-gray-500">Телефон</span>
+        <span><%= @order.customer_phone %></span>
+      </div>
+    <% end %>
+    <% if @order.tracking_number.present? %>
+      <div class="flex justify-between text-sm">
+        <span class="text-forma-gray-500">Трек-номер</span>
+        <span class="font-mono"><%= @order.tracking_number %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Сумма %>
+  <div class="px-4 mt-6 pt-4 border-t border-forma-gray-200">
+    <div class="flex justify-between font-bold">
+      <span>Итого</span>
+      <span><%= number_to_currency(@order.total_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+    </div>
+  </div>
+
+  <%# Штрихкод %>
+  <div class="px-4 mt-6 flex justify-center">
+    <div class="p-4 bg-white border border-forma-gray-200 rounded-xl">
+      <% barcode_png = Orders::BarcodeGenerator.call(@order) %>
+      <%= image_tag "data:image/png;base64,#{Base64.strict_encode64(barcode_png)}",
+          alt: @order.barcode_value, class: "h-12" %>
+      <p class="text-xs text-center text-forma-gray-500 mt-1 font-mono"><%= @order.barcode_value %></p>
+    </div>
+  </div>
+</div>

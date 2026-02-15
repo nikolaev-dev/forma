@@ -1,0 +1,68 @@
+<% content_for(:title) { "Оформление — FORMA" } %>
+
+<div class="pt-8 pb-4">
+  <div class="px-4">
+    <h1 class="text-xl font-bold">Оформление заказа</h1>
+  </div>
+
+  <%# Краткая информация о заказе %>
+  <% if @order_item %>
+    <div class="px-4 mt-4 p-3 bg-forma-gray-50 rounded-xl">
+      <div class="flex justify-between text-sm">
+        <span class="text-forma-gray-500"><%= @order_item.notebook_sku.name %></span>
+        <span class="font-medium"><%= number_to_currency(@order_item.unit_price_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form_with(model: @order, url: order_path(@order), method: :patch, class: "px-4 mt-6 space-y-4") do |f| %>
+    <div>
+      <label class="block text-sm font-medium mb-1" for="order_customer_name">Имя</label>
+      <%= f.text_field :customer_name, required: true, minlength: 2,
+          class: "w-full px-4 py-3 rounded-xl border border-forma-gray-200 text-sm focus:border-forma-black focus:outline-none",
+          placeholder: "Ваше имя" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="order_customer_phone">Телефон</label>
+      <%= f.phone_field :customer_phone, required: true,
+          class: "w-full px-4 py-3 rounded-xl border border-forma-gray-200 text-sm focus:border-forma-black focus:outline-none",
+          placeholder: "+7 (900) 123-45-67" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="order_customer_email">Email</label>
+      <%= f.email_field :customer_email, required: true,
+          class: "w-full px-4 py-3 rounded-xl border border-forma-gray-200 text-sm focus:border-forma-black focus:outline-none",
+          placeholder: "email@example.com" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="order_notes">Комментарий</label>
+      <%= f.text_area :notes, rows: 2, maxlength: 500,
+          class: "w-full px-4 py-3 rounded-xl border border-forma-gray-200 text-sm focus:border-forma-black focus:outline-none resize-none",
+          placeholder: "Пожелания к заказу (необязательно)" %>
+    </div>
+
+    <%# Итого %>
+    <div class="pt-2 border-t border-forma-gray-200">
+      <div class="flex justify-between text-sm">
+        <span>Товары</span>
+        <span><%= number_to_currency(@order.subtotal_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+      </div>
+      <% if @order.shipping_cents > 0 %>
+        <div class="flex justify-between text-sm mt-1">
+          <span>Доставка</span>
+          <span><%= number_to_currency(@order.shipping_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+        </div>
+      <% end %>
+      <div class="flex justify-between font-bold mt-2">
+        <span>Итого</span>
+        <span><%= number_to_currency(@order.total_cents / 100.0, unit: "\u20BD", format: "%n %u") %></span>
+      </div>
+    </div>
+
+    <%= f.submit "Перейти к оплате",
+        class: "w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black mt-4 cursor-pointer" %>
+  <% end %>
+</div>

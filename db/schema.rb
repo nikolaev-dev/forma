@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_15_200006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -127,6 +127,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
     t.index ["visibility"], name: "index_designs_on_visibility"
   end
 
+  create_table "fillings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "default_settings", default: {}
+    t.string "filling_type", null: false
+    t.boolean "is_active", default: true
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["filling_type"], name: "index_fillings_on_filling_type"
+    t.index ["slug"], name: "index_fillings_on_slug", unique: true
+  end
+
   create_table "generation_selections", force: :cascade do |t|
     t.bigint "anonymous_identity_id"
     t.datetime "created_at", null: false
@@ -182,6 +194,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
     t.index ["user_id"], name: "index_generations_on_user_id"
   end
 
+  create_table "notebook_skus", force: :cascade do |t|
+    t.jsonb "brand_elements", default: {}
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "RUB", null: false
+    t.boolean "is_active", default: true
+    t.string "name", null: false
+    t.integer "price_cents", null: false
+    t.jsonb "specs", default: {}
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_notebook_skus_on_code", unique: true
+  end
+
   create_table "oauth_identities", force: :cascade do |t|
     t.text "access_token"
     t.datetime "created_at", null: false
@@ -195,6 +220,82 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
     t.bigint "user_id", null: false
     t.index ["provider", "uid"], name: "index_oauth_identities_on_provider_and_uid", unique: true
     t.index ["user_id"], name: "index_oauth_identities_on_user_id"
+  end
+
+  create_table "order_files", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "file_type", null: false
+    t.jsonb "metadata", default: {}
+    t.bigint "order_id", null: false
+    t.string "status", default: "created"
+    t.datetime "updated_at", null: false
+    t.index ["order_id", "file_type"], name: "index_order_files_on_order_id_and_file_type"
+    t.index ["order_id"], name: "index_order_files_on_order_id"
+  end
+
+  create_table "order_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "design_id", null: false
+    t.bigint "filling_id", null: false
+    t.string "format"
+    t.bigint "notebook_sku_id", null: false
+    t.bigint "order_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.jsonb "settings_snapshot", default: {}
+    t.integer "total_price_cents", null: false
+    t.integer "unit_price_cents", null: false
+    t.datetime "updated_at", null: false
+    t.index ["design_id"], name: "index_order_items_on_design_id"
+    t.index ["filling_id"], name: "index_order_items_on_filling_id"
+    t.index ["notebook_sku_id"], name: "index_order_items_on_notebook_sku_id"
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "anonymous_identity_id"
+    t.string "barcode_type", default: "code128", null: false
+    t.string "barcode_value", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "RUB", null: false
+    t.citext "customer_email"
+    t.string "customer_name"
+    t.string "customer_phone"
+    t.text "notes"
+    t.string "order_number", null: false
+    t.text "production_notes"
+    t.jsonb "shipping_address", default: {}
+    t.integer "shipping_cents", default: 0, null: false
+    t.string "shipping_method"
+    t.string "status", default: "draft", null: false
+    t.integer "subtotal_cents", default: 0, null: false
+    t.integer "total_cents", default: 0, null: false
+    t.string "tracking_number"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["anonymous_identity_id"], name: "index_orders_on_anonymous_identity_id"
+    t.index ["barcode_value"], name: "index_orders_on_barcode_value", unique: true
+    t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["status"], name: "index_orders_on_status"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.datetime "captured_at"
+    t.text "confirmation_url"
+    t.datetime "created_at", null: false
+    t.string "currency", default: "RUB", null: false
+    t.string "idempotence_key"
+    t.bigint "payable_id", null: false
+    t.string "payable_type", null: false
+    t.string "provider", default: "yookassa", null: false
+    t.string "provider_payment_id"
+    t.jsonb "raw", default: {}
+    t.string "status", default: "created", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payable_type", "payable_id"], name: "index_payments_on_payable_type_and_payable_id"
+    t.index ["provider_payment_id"], name: "index_payments_on_provider_payment_id", unique: true, where: "(provider_payment_id IS NOT NULL)"
+    t.index ["status"], name: "index_payments_on_status"
   end
 
   create_table "prompt_versions", force: :cascade do |t|
@@ -333,6 +434,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_100008) do
   add_foreign_key "generations", "designs"
   add_foreign_key "generations", "users"
   add_foreign_key "oauth_identities", "users"
+  add_foreign_key "order_files", "orders"
+  add_foreign_key "order_items", "designs"
+  add_foreign_key "order_items", "fillings"
+  add_foreign_key "order_items", "notebook_skus"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "anonymous_identities"
+  add_foreign_key "orders", "users"
   add_foreign_key "prompt_versions", "prompts"
   add_foreign_key "prompt_versions", "users", column: "changed_by_user_id"
   add_foreign_key "prompts", "designs"
