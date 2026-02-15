@@ -339,26 +339,26 @@
 > Переход от абстрактных Base/Pro/Elite к продуктам с реальной разницей в производственных технологиях.
 
 #### 9.1. Переименование SKU
-- [ ] Миграция: обновить notebook_skus (base→core, pro→signature, elite→lux)
+- [x] Миграция: обновить notebook_skus (base→core, pro→signature, elite→lux)
 - [ ] Обновить цены (TBD — определяются позже)
 - [ ] Обновить specs (jsonb): производственные параметры каждого уровня
 - [ ] Обновить brand_elements (jsonb): что входит в каждый уровень
-- [ ] Seed-данные: обновленные SKU
+- [x] Seed-данные: обновленные SKU
 
 #### 9.2. Tier-ось в генерации
-- [ ] Миграция: GenerationVariant + tier (string: core/signature/lux, nullable)
-- [ ] Миграция: tier_modifiers (tier, prompt_modifier, identity_elements, negative_prompt, settings)
-- [ ] Модель TierModifier
-- [ ] Seed-данные: tier_modifiers для core/signature/lux (из brainstorm)
+- [x] Миграция: GenerationVariant + tier (string: core/signature/lux, nullable)
+- [x] Миграция: tier_modifiers (tier, prompt_modifier, identity_elements, negative_prompt, settings)
+- [x] Модель TierModifier
+- [x] Seed-данные: tier_modifiers для core/signature/lux (из brainstorm)
 
 #### 9.3. Обновление PromptComposer
-- [ ] Расширить PromptComposer: принимает tier как параметр
-- [ ] Шаблон промпта: `{scene} + {design_prompt} + {tier_modifier} + {identity} + {negative}`
+- [x] Расширить PromptComposer: принимает tier как параметр (TierPromptComposer — отдельный сервис)
+- [x] Шаблон промпта: `{scene} + {design_prompt} + {tier_modifier} + {identity} + {negative}`
 - [ ] Предпросмотр финального промпта для каждого уровня
 
 #### 9.4. Tier в заказах
-- [ ] Миграция: order_items + tier (string)
-- [ ] Обновить OrderItem: сохранять tier при оформлении
+- [x] Миграция: order_items + tier (string)
+- [x] Обновить OrderItem: сохранять tier при оформлении
 - [ ] Обновить экран S9: визуальный выбор уровня с 3 разными превью
 
 **Результат:** 3 уровня продукта с производственной разницей, tier-специфичные промпты.
@@ -395,14 +395,14 @@
 
 > Коллекция — группировка дизайнов по теме/настроению. Regular (без лимита) или Limited (тираж N шт).
 
-- [ ] Миграция: collections (name, slug, description, collection_type: regular/limited, edition_size, stock_remaining, is_active, position)
-- [ ] Модель Collection + ActiveStorage (cover_image) + валидации
-- [ ] Миграция: designs + collection_id (FK, nullable)
+- [x] Миграция: collections (name, slug, description, collection_type: regular/limited, edition_size, stock_remaining, is_active, position)
+- [x] Модель Collection + ActiveStorage (cover_image) + валидации
+- [x] Миграция: designs + collection_id (FK, nullable)
 - [ ] CRUD коллекций в админке
 - [ ] Публичная страница коллекции: `/collections/:slug`
 - [ ] Витрина коллекций на S1 (новая секция)
 - [ ] Лимитированные коллекции: отображение "Осталось X/N"
-- [ ] Stock tracking: декремент при оформлении заказа
+- [x] Stock tracking: декремент при оформлении заказа
 - [ ] Привязка дизайнов к коллекциям (админка + API)
 
 **Результат:** Дизайны группируются в коллекции, лимитированные серии с учетом остатков.
@@ -433,20 +433,20 @@
 > Обработка референсных фото: AI-анализ, курирование, 3-tier генерация.
 
 #### 13.1. Загрузка референсов
-- [ ] Миграция: training_batches (name, status, images_count, created_by_user_id)
-- [ ] Миграция: reference_images (training_batch_id, status, ai_analysis_claude, ai_analysis_openai, selected_provider, curated_prompt, collection_id, design_id, curator_notes)
-- [ ] Модель TrainingBatch + state machine (uploaded/processing/completed)
-- [ ] Модель ReferenceImage + state machine (uploaded/analyzing/analyzed/curated/generated/published/rejected) + ActiveStorage (original_image)
+- [x] Миграция: training_batches (name, status, images_count, created_by_user_id)
+- [x] Миграция: reference_images (training_batch_id, status, ai_analysis_claude, ai_analysis_openai, selected_provider, curated_prompt, collection_id, design_id, curator_notes)
+- [x] Модель TrainingBatch + state machine (uploaded/processing/completed)
+- [x] Модель ReferenceImage + state machine (uploaded/analyzing/analyzed/curated/generated/published/rejected) + ActiveStorage (original_image)
 - [ ] Админка: загрузка референсов (drag-n-drop / ZIP)
 - [ ] Группировка в батчи, превью-сетка с фильтрами по статусу
 
 #### 13.2. AI-анализ изображений
-- [ ] Интеграция Claude Vision API
-- [ ] Интеграция GPT-4V API (A/B сравнение)
-- [ ] Sidekiq Job: ReferenceImageAnalysisJob (пакетный)
-- [ ] Извлечение: описание, базовый промпт, теги (матчинг с таксономией), mood, цвета, стиль, сложность
-- [ ] Хранение результатов в ai_analysis_claude / ai_analysis_openai (jsonb)
-- [ ] Идемпотентность: повторный анализ не затирает курированные данные
+- [x] Интеграция Claude Vision API
+- [x] Интеграция GPT-4V API (A/B сравнение)
+- [x] Sidekiq Job: ReferenceImageAnalysisJob (пакетный)
+- [x] Извлечение: описание, базовый промпт, теги (матчинг с таксономией), mood, цвета, стиль, сложность
+- [x] Хранение результатов в ai_analysis_claude / ai_analysis_openai (jsonb)
+- [x] Идемпотентность: повторный анализ не затирает курированные данные
 
 #### 13.3. Курирование
 - [ ] Админ-карточка референса: оригинал + AI-предложения (side-by-side)
@@ -455,21 +455,21 @@
 - [ ] Чипсы тегов с автодополнением
 - [ ] Назначение коллекции (существующей или новой)
 - [ ] Bulk-действия: "применить коллекцию ко всем выбранным"
-- [ ] Статус перехода: analyzed → curated
+- [x] Статус перехода: analyzed → curated
 
 #### 13.4. 3-Tier генерация
-- [ ] Из curated промпта → 3 изображения (Core / Signature / Lux)
-- [ ] Каждый = GenerationVariant с tier-specific промптом
-- [ ] Адаптация Pipeline: generation.source = "training_pipeline"
+- [x] Из curated промпта → 3 изображения (Core / Signature / Lux)
+- [x] Каждый = GenerationVariant с tier-specific промптом
+- [x] Адаптация Pipeline: generation.source = "training_pipeline"
 - [ ] Курирование результатов: approve / reject / regenerate (по каждому уровню)
 - [ ] A/B сравнение в курировании: оригинал слева, 3 tier справа
 
 #### 13.5. Публикация
-- [ ] Одобренные → Design в каталоге (visibility: public)
-- [ ] Привязка к коллекции, стилю, тегам
-- [ ] 3 tier-варианта привязаны к Design
-- [ ] reference_image.design_id = created design
-- [ ] reference_image.status = published
+- [x] Одобренные → Design в каталоге (visibility: public)
+- [x] Привязка к коллекции, стилю, тегам
+- [x] 3 tier-варианта привязаны к Design
+- [x] reference_image.design_id = created design
+- [x] reference_image.status = published
 
 **Результат:** 400+ референсов → AI-анализ → курирование → 3-tier дизайны в каталоге.
 

@@ -385,6 +385,33 @@ end
 puts "\n✓ Visual demo data complete!"
 
 # =============================================================================
+# TIER MODIFIERS — модификаторы промптов для тиров
+# =============================================================================
+core_neg = "cartoon, illustration, CGI look, low poly, fantasy shapes, melted materials, bad stitching, crooked edges, warped perspective, blurry, low resolution, noisy grain, harsh flash, oversaturated, plastic toy look, visible brand logos, readable text, watermarks, hands, people, cluttered background, unrealistic reflections, misaligned bookmarks, extra straps, extra corners chamfered, deformed hexagon"
+
+TierModifier.find_or_create_by!(tier: "core") do |t|
+  t.prompt_modifier = "Coated paper wrap cover (NOT leather), matte lamination, flat printed wave (no UV, no embossing), simple elastic band, two plain ribbon bookmarks, no metal hardware, no badge, clean minimal product"
+  t.identity_elements = "Two plain ribbon bookmarks, one chamfered 45-degree top-right corner, simple FORMA card in back pocket"
+  t.negative_prompt = core_neg
+  t.settings = { aspect_ratio: "2:3", lens: "50mm", style_notes: "photorealistic, manufacturable details, high micro-texture fidelity" }
+end
+
+TierModifier.find_or_create_by!(tier: "signature") do |t|
+  t.prompt_modifier = "Soft-touch paper cover with visible matte texture, spot UV / 3D varnish ONLY on the wave area (visible wet gloss shimmer), blind embossed small logo, two ribbon bookmarks, standard elastic strap, no metal parts"
+  t.identity_elements = "Blind embossed hexagonal badge, two ribbon bookmarks, one chamfered 45-degree top-right corner, personalized FORMA card in back pocket"
+  t.negative_prompt = core_neg
+  t.settings = { aspect_ratio: "2:3", lens: "50mm", style_notes: "photorealistic, manufacturable details, high micro-texture fidelity" }
+end
+
+TierModifier.find_or_create_by!(tier: "lux") do |t|
+  t.prompt_modifier = "Real leather cover with visible natural grain, deep multi-level embossed wave with domed resin lens inlay (glass-like surface), polished faceted hexagonal metal badge on magnetic flap closure, two ribbon bookmarks with small hex metal tips, painted edge (gold/pearl tint), premium rigid gift box nearby"
+  t.identity_elements = "Polished metal hexagonal badge, two ribbon bookmarks with hex metal tips, one chamfered 45-degree top-right corner, numbered collector passport in back pocket"
+  t.negative_prompt = core_neg
+  t.settings = { aspect_ratio: "2:3", lens: "50mm", style_notes: "photorealistic, manufacturable details, high micro-texture fidelity, leather grain, stitching, edge paint, metal reflections" }
+end
+puts "Tier modifiers: #{TierModifier.count} records"
+
+# =============================================================================
 # FILLINGS — наполнения блокнота
 # =============================================================================
 fillings_data = [
@@ -406,11 +433,11 @@ puts "Fillings: #{Filling.count} records"
 # NOTEBOOK SKUs — комплектации
 # =============================================================================
 skus_data = [
-  { code: "base",  name: "FORMA Base",  price_cents: 259900,
+  { code: "core",      name: "FORMA Core",      price_cents: 259900,
     specs: { cover: "Софт-тач ламинация", pages: "80 листов", format: "A5" } },
-  { code: "pro",   name: "FORMA Pro",   price_cents: 319900,
+  { code: "signature", name: "FORMA Signature", price_cents: 319900,
     specs: { cover: "Софт-тач + тиснение", pages: "120 листов", format: "A5", extras: "Ленточка-закладка" } },
-  { code: "elite", name: "FORMA Elite", price_cents: 899900,
+  { code: "lux",       name: "FORMA Lux",       price_cents: 899900,
     specs: { cover: "Итальянская кожа", pages: "160 листов", format: "A5", extras: "Закладка, резинка, DNA Card" } }
 ]
 

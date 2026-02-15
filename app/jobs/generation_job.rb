@@ -33,6 +33,15 @@ class GenerationJob < ApplicationJob
       quality: "preview"
     }
 
+    # Add tier-specific settings from TierModifier
+    if variant.tier.present?
+      tier_modifier = TierModifier.find_by(tier: variant.tier)
+      if tier_modifier
+        request[:negative_prompt] = tier_modifier.negative_prompt
+        request[:settings] = tier_modifier.settings
+      end
+    end
+
     provider_job_id = provider.create_generation(request)
     variant.queue!(provider_job_id)
 
@@ -71,7 +80,8 @@ class GenerationJob < ApplicationJob
     return unless result[:image_data]
 
     extension = result[:content_type]&.split("/")&.last || "png"
-    filename = "#{variant.generation_id}_#{variant.kind}.#{extension}"
+    tier_suffix = variant.tier.present? ? "_#{variant.tier}" : ""
+    filename = "#{variant.generation_id}_#{variant.kind}#{tier_suffix}.#{extension}"
 
     variant.preview_image.attach(
       io: StringIO.new(result[:image_data]),

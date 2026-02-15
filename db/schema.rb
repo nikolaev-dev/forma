@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_16_000008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -107,6 +107,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.index ["slug"], name: "index_catalog_sections_on_slug", unique: true
   end
 
+  create_table "collections", force: :cascade do |t|
+    t.string "collection_type", default: "regular", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "edition_size"
+    t.boolean "is_active", default: true, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.integer "stock_remaining"
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_collections_on_slug", unique: true
+  end
+
   create_table "design_ratings", force: :cascade do |t|
     t.string "comment"
     t.datetime "created_at", null: false
@@ -133,6 +147,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
 
   create_table "designs", force: :cascade do |t|
     t.text "base_prompt"
+    t.bigint "collection_id"
     t.datetime "created_at", null: false
     t.jsonb "metadata", default: {}
     t.string "moderation_status", default: "ok", null: false
@@ -145,6 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.string "visibility", default: "private", null: false
+    t.index ["collection_id"], name: "index_designs_on_collection_id"
     t.index ["moderation_status"], name: "index_designs_on_moderation_status"
     t.index ["popularity_score"], name: "index_designs_on_popularity_score"
     t.index ["search_vector"], name: "index_designs_on_search_vector", using: :gin
@@ -216,8 +232,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.jsonb "provider_metadata", default: {}
     t.bigint "seed"
     t.string "status", default: "created", null: false
+    t.string "tier"
     t.datetime "updated_at", null: false
-    t.index ["generation_id", "kind"], name: "index_generation_variants_on_generation_id_and_kind", unique: true
+    t.index ["generation_id", "kind", "tier"], name: "idx_gen_variants_unique_kind_with_tier", unique: true, where: "(tier IS NOT NULL)"
+    t.index ["generation_id", "kind"], name: "idx_gen_variants_unique_kind_no_tier", unique: true, where: "(tier IS NULL)"
     t.index ["generation_id"], name: "index_generation_variants_on_generation_id"
     t.index ["provider_job_id"], name: "index_generation_variants_on_provider_job_id"
     t.index ["status"], name: "index_generation_variants_on_status"
@@ -293,6 +311,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.bigint "order_id", null: false
     t.integer "quantity", default: 1, null: false
     t.jsonb "settings_snapshot", default: {}
+    t.string "tier"
     t.integer "total_price_cents", null: false
     t.integer "unit_price_cents", null: false
     t.datetime "updated_at", null: false
@@ -367,6 +386,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.bigint "design_id", null: false
     t.datetime "updated_at", null: false
     t.index ["design_id"], name: "index_prompts_on_design_id"
+  end
+
+  create_table "reference_images", force: :cascade do |t|
+    t.jsonb "ai_analysis_claude", default: {}
+    t.jsonb "ai_analysis_openai", default: {}
+    t.bigint "collection_id"
+    t.datetime "created_at", null: false
+    t.text "curated_prompt"
+    t.text "curator_notes"
+    t.bigint "design_id"
+    t.string "selected_provider"
+    t.string "status", default: "uploaded", null: false
+    t.bigint "training_batch_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id"], name: "index_reference_images_on_collection_id"
+    t.index ["design_id"], name: "index_reference_images_on_design_id"
+    t.index ["status"], name: "index_reference_images_on_status"
+    t.index ["training_batch_id"], name: "index_reference_images_on_training_batch_id"
   end
 
   create_table "style_tags", force: :cascade do |t|
@@ -449,6 +486,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
     t.index ["visibility"], name: "index_tags_on_visibility"
   end
 
+  create_table "tier_modifiers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "identity_elements"
+    t.text "negative_prompt"
+    t.text "prompt_modifier", null: false
+    t.jsonb "settings", default: {}, null: false
+    t.string "tier", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tier"], name: "index_tier_modifiers_on_tier", unique: true
+  end
+
+  create_table "training_batches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_user_id", null: false
+    t.integer "images_count", default: 0, null: false
+    t.string "name", null: false
+    t.string "status", default: "uploaded", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_user_id"], name: "index_training_batches_on_created_by_user_id"
+    t.index ["status"], name: "index_training_batches_on_status"
+  end
+
   create_table "usage_counters", force: :cascade do |t|
     t.bigint "anonymous_identity_id"
     t.datetime "created_at", null: false
@@ -489,6 +548,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
   add_foreign_key "design_ratings", "users"
   add_foreign_key "design_tags", "designs"
   add_foreign_key "design_tags", "tags"
+  add_foreign_key "designs", "collections"
   add_foreign_key "designs", "designs", column: "source_design_id"
   add_foreign_key "designs", "styles"
   add_foreign_key "designs", "users"
@@ -514,12 +574,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_15_500002) do
   add_foreign_key "prompt_versions", "prompts"
   add_foreign_key "prompt_versions", "users", column: "changed_by_user_id"
   add_foreign_key "prompts", "designs"
+  add_foreign_key "reference_images", "collections"
+  add_foreign_key "reference_images", "designs"
+  add_foreign_key "reference_images", "training_batches"
   add_foreign_key "style_tags", "styles"
   add_foreign_key "style_tags", "tags"
   add_foreign_key "tag_relations", "tags", column: "from_tag_id"
   add_foreign_key "tag_relations", "tags", column: "to_tag_id"
   add_foreign_key "tag_synonyms", "tags"
   add_foreign_key "tags", "tag_categories"
+  add_foreign_key "training_batches", "users", column: "created_by_user_id"
   add_foreign_key "usage_counters", "anonymous_identities"
   add_foreign_key "usage_counters", "users"
 end

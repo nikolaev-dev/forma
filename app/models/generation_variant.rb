@@ -14,10 +14,13 @@ class GenerationVariant < ApplicationRecord
     failed: "failed"
   }, prefix: true
 
+  TIERS = TierModifier::TIERS
+
   validates :kind, presence: true
   validates :status, presence: true
   validates :composed_prompt, presence: true
-  validates :kind, uniqueness: { scope: :generation_id }
+  validates :tier, inclusion: { in: TIERS }, allow_nil: true
+  validates :kind, uniqueness: { scope: [:generation_id, :tier] }
 
   def queue!(provider_job_id)
     update!(status: "queued", provider_job_id: provider_job_id)

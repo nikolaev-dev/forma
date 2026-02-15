@@ -12,7 +12,8 @@ class Generation < ApplicationRecord
     create: "create",
     refine: "refine",
     remix: "remix",
-    admin_batch: "admin_batch"
+    admin_batch: "admin_batch",
+    training_pipeline: "training_pipeline"
   }, prefix: true
 
   enum :status, {

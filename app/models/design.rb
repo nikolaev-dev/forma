@@ -4,6 +4,7 @@ class Design < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :source_design, class_name: "Design", optional: true
   belongs_to :style, optional: true
+  belongs_to :collection, optional: true
 
   has_many :remixes, class_name: "Design", foreign_key: :source_design_id, dependent: :nullify
   has_many :design_tags, dependent: :destroy
