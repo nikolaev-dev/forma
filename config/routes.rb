@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   get  "auth/failure",            to: "sessions#failure"
   delete "logout",                to: "sessions#destroy", as: :logout
 
+  # API
+  namespace :api do
+    get "catalog/styles",   to: "catalog#styles"
+    get "catalog/sections", to: "catalog#sections"
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
