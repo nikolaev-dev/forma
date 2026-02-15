@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@theme {
+  --color-forma-black: #000000;
+  --color-forma-white: #ffffff;
+  --color-forma-gray-50: #fafafa;
+  --color-forma-gray-100: #f5f5f5;
+  --color-forma-gray-200: #e5e5e5;
+  --color-forma-gray-300: #d4d4d4;
+  --color-forma-gray-400: #a3a3a3;
+  --color-forma-gray-500: #737373;
+  --color-forma-gray-600: #525252;
+  --color-forma-gray-700: #404040;
+  --color-forma-gray-800: #262626;
+  --color-forma-gray-900: #171717;
+  --color-forma-accent: #000000;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --spacing-tab-bar: 5rem;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

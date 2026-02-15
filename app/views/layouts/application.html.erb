@@ -1,28 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
   <head>
-    <title><%= content_for(:title) || "Forma" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for(:title) || "FORMA" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Forma">
+    <meta name="application-name" content="FORMA">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="bg-white text-black antialiased font-sans min-h-dvh flex flex-col">
+    <main class="flex-1 pb-20">
+      <% if flash[:notice] %>
+        <%= render "shared/toast", type: :notice, message: flash[:notice] %>
+      <% end %>
+      <% if flash[:alert] %>
+        <%= render "shared/toast", type: :alert, message: flash[:alert] %>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <%= render "shared/tab_bar" %>
   </body>
 </html>

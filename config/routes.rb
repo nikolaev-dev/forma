@@ -5,10 +5,23 @@ Rails.application.routes.draw do
   get  "auth/failure",            to: "sessions#failure"
   delete "logout",                to: "sessions#destroy", as: :logout
 
+  # Pages
+  root "catalog#index"
+  get "catalog", to: "catalog#index"
+
+  resources :creations, only: [ :new, :create, :show ] do
+    member do
+      get :progress
+      get :result
+    end
+  end
+
   # API
   namespace :api do
     get "catalog/styles",   to: "catalog#styles"
     get "catalog/sections", to: "catalog#sections"
+    get "tags/search",      to: "tags#search"
+    get "generations/:id/status", to: "generations#status", as: :generation_status
   end
 
   # Health check

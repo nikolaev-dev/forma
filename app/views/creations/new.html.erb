@@ -1,0 +1,62 @@
+<% content_for(:title) { "Создать — FORMA" } %>
+
+<div class="px-4 pt-8 pb-4" data-controller="creation-form tag-selector">
+  <h1 class="text-xl font-bold">Создать дизайн</h1>
+
+  <% if @style %>
+    <div class="mt-4 flex items-center gap-3 p-3 bg-forma-gray-50 rounded-xl">
+      <div class="w-12 h-16 rounded-lg overflow-hidden bg-forma-gray-200 flex-shrink-0">
+        <% if @style.cover_image.attached? %>
+          <%= image_tag @style.cover_image, class: "w-full h-full object-cover" %>
+        <% end %>
+      </div>
+      <div>
+        <p class="text-sm font-medium"><%= @style.name %></p>
+        <p class="text-xs text-forma-gray-500">Выбранный стиль</p>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form_with url: creations_path, method: :post, data: { action: "submit->creation-form#submit" } do |f| %>
+    <input type="hidden" name="creation[style_slug]" value="<%= @style&.slug %>">
+
+    <div class="mt-6">
+      <label for="user_prompt" class="block text-sm font-medium text-forma-gray-700">Опишите ваш блокнот</label>
+      <textarea
+        name="creation[user_prompt]"
+        id="user_prompt"
+        rows="3"
+        placeholder="Например: минималистичный блокнот с горным пейзажем на закате..."
+        class="mt-2 w-full rounded-xl border border-forma-gray-200 px-4 py-3 text-sm placeholder:text-forma-gray-400 focus:border-forma-black focus:ring-1 focus:ring-forma-black resize-none"
+        data-creation-form-target="prompt"
+        data-action="input->creation-form#validate"><%= params.dig(:creation, :user_prompt) %></textarea>
+    </div>
+
+    <%# Теги по категориям %>
+    <% @categories.each do |category| %>
+      <% category_tags = @available_tags.select { |t| t.tag_category_id == category.id } %>
+      <% next if category_tags.empty? %>
+
+      <div class="mt-6">
+        <h3 class="text-sm font-medium text-forma-gray-700"><%= category.name %></h3>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <% category_tags.each do |tag| %>
+            <%= render "shared/tag_chip", tag: tag, selected: false, selectable: true %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Hidden inputs для выбранных тегов %>
+    <div data-tag-selector-target="inputs"></div>
+
+    <div class="mt-8">
+      <button type="submit"
+              class="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black disabled:bg-forma-gray-300 disabled:cursor-not-allowed transition-colors"
+              data-creation-form-target="submit"
+              disabled>
+        Сгенерировать
+      </button>
+    </div>
+  <% end %>
+</div>

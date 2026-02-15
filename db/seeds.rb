@@ -196,3 +196,186 @@ Style.published.each_with_index do |style, idx|
   end
 end
 puts "Catalog sections: #{CatalogSection.count}, items: #{CatalogItem.count}"
+
+# =============================================================================
+# VISUAL DEMO DATA — cover images, popularity scores, completed generation
+# =============================================================================
+require "chunky_png"
+Rails.application.config.active_job.queue_adapter = :inline
+
+# Палитра цветов для стилей (обложки-заглушки с градиентами и фигурами)
+STYLE_PALETTES = {
+  "japanese-minimalism"  => { bg: [245, 240, 235], fg: [180, 160, 140], accent: [120, 100, 80]  },
+  "italian-marble"       => { bg: [245, 245, 250], fg: [200, 190, 200], accent: [200, 170, 80]  },
+  "scandinavian-cozy"    => { bg: [250, 245, 240], fg: [210, 195, 175], accent: [180, 160, 130] },
+  "french-art-deco"      => { bg: [30, 30, 35],    fg: [200, 170, 80],  accent: [255, 215, 100] },
+  "moroccan-ceramic"     => { bg: [220, 160, 100], fg: [60, 120, 120],  accent: [200, 80, 60]   },
+  "night-sky"            => { bg: [15, 15, 45],    fg: [40, 40, 80],    accent: [255, 255, 200] },
+  "spring-garden"        => { bg: [250, 240, 245], fg: [220, 180, 190], accent: [180, 220, 160] },
+  "desert-sunset"        => { bg: [230, 170, 100], fg: [200, 120, 60],  accent: [250, 200, 80]  },
+  "velvet-night"         => { bg: [50, 20, 35],    fg: [100, 40, 60],   accent: [180, 80, 100]  },
+  "mountain-mist"        => { bg: [200, 215, 230], fg: [150, 170, 190], accent: [100, 130, 160] }
+}
+
+POPULARITY_SCORES = {
+  "japanese-minimalism" => 4.8, "italian-marble" => 4.5, "scandinavian-cozy" => 4.2,
+  "french-art-deco" => 4.7, "moroccan-ceramic" => 3.9, "night-sky" => 4.6,
+  "spring-garden" => 4.1, "desert-sunset" => 3.8, "velvet-night" => 4.3,
+  "mountain-mist" => 4.0
+}
+
+def generate_cover_png(palette, width: 360, height: 480)
+  bg = palette[:bg]
+  fg = palette[:fg]
+  accent = palette[:accent]
+
+  png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color.rgb(*bg))
+
+  # Gradient background — vertical
+  height.times do |y|
+    ratio = y.to_f / height
+    r = (bg[0] * (1 - ratio * 0.3) + fg[0] * ratio * 0.3).to_i.clamp(0, 255)
+    g = (bg[1] * (1 - ratio * 0.3) + fg[1] * ratio * 0.3).to_i.clamp(0, 255)
+    b = (bg[2] * (1 - ratio * 0.3) + fg[2] * ratio * 0.3).to_i.clamp(0, 255)
+    color = ChunkyPNG::Color.rgb(r, g, b)
+    width.times { |x| png[x, y] = color }
+  end
+
+  # Geometric shapes
+  fg_color = ChunkyPNG::Color.rgb(*fg)
+  accent_color = ChunkyPNG::Color.rgb(*accent)
+
+  # Large circle
+  cx, cy, cr = width / 2, height / 3, [width, height].min / 4
+  (cy - cr..cy + cr).each do |y|
+    next if y < 0 || y >= height
+    (cx - cr..cx + cr).each do |x|
+      next if x < 0 || x >= width
+      dist = Math.sqrt((x - cx)**2 + (y - cy)**2)
+      if dist <= cr
+        alpha = [ 1.0 - (dist / cr) * 0.5, 0.0 ].max
+        base = png[x, y]
+        br = ChunkyPNG::Color.r(base)
+        bg_val = ChunkyPNG::Color.g(base)
+        bb = ChunkyPNG::Color.b(base)
+        nr = (br * (1 - alpha * 0.6) + fg[0] * alpha * 0.6).to_i.clamp(0, 255)
+        ng = (bg_val * (1 - alpha * 0.6) + fg[1] * alpha * 0.6).to_i.clamp(0, 255)
+        nb = (bb * (1 - alpha * 0.6) + fg[2] * alpha * 0.6).to_i.clamp(0, 255)
+        png[x, y] = ChunkyPNG::Color.rgb(nr, ng, nb)
+      end
+    end
+  end
+
+  # Horizontal accent stripe
+  stripe_y = (height * 0.6).to_i
+  stripe_h = (height * 0.04).to_i
+  (stripe_y..stripe_y + stripe_h).each do |y|
+    next if y >= height
+    width.times do |x|
+      margin = width * 0.15
+      next if x < margin || x > width - margin
+      png[x, y] = accent_color
+    end
+  end
+
+  # Small dots pattern
+  dot_r = 3
+  (0..width).step(24) do |dx|
+    (height * 0.7).to_i.step(height - 20, 24) do |dy|
+      ((dy - dot_r)..(dy + dot_r)).each do |y|
+        next if y < 0 || y >= height
+        ((dx - dot_r)..(dx + dot_r)).each do |x|
+          next if x < 0 || x >= width
+          png[x, y] = accent_color if Math.sqrt((x - dx)**2 + (y - dy)**2) <= dot_r
+        end
+      end
+    end
+  end
+
+  png.to_blob(:fast_rgb)
+end
+
+def generate_variant_png(palette, variant_shift, width: 480, height: 640)
+  shifted = {
+    bg: palette[:bg].map { |c| (c + variant_shift).clamp(0, 255) },
+    fg: palette[:fg].map { |c| (c + variant_shift * 2).clamp(0, 255) },
+    accent: palette[:accent]
+  }
+  generate_cover_png(shifted, width: width, height: height)
+end
+
+# Attach cover images + set popularity scores
+puts "Generating cover images..."
+Style.find_each do |style|
+  palette = STYLE_PALETTES[style.slug]
+  next unless palette
+
+  unless style.cover_image.attached?
+    blob = generate_cover_png(palette)
+    style.cover_image.attach(
+      io: StringIO.new(blob),
+      filename: "#{style.slug}-cover.png",
+      content_type: "image/png"
+    )
+    puts "  ✓ Cover: #{style.name}"
+  end
+
+  score = POPULARITY_SCORES[style.slug]
+  style.update_columns(popularity_score: score) if score && style.popularity_score != score
+end
+
+# --- Completed generation (для демо страницы результата) ---
+puts "Creating demo generation..."
+
+demo_style = Style.find_by(slug: "japanese-minimalism")
+if demo_style
+  design = Design.find_or_create_by!(slug: "demo-japanese") do |d|
+    d.user = admin
+    d.style = demo_style
+    d.title = "Японский минимализм — демо"
+    d.base_prompt = "Минималистичный блокнот в японском стиле, чистые линии, натуральные текстуры"
+    d.visibility = "public"
+    d.moderation_status = "ok"
+  end
+
+  design.create_prompt!(current_text: design.base_prompt) unless design.prompt
+
+  generation = Generation.find_or_create_by!(design: design, source: "create") do |g|
+    g.user = admin
+    g.status = "succeeded"
+    g.provider = "test"
+    g.preset_snapshot = demo_style.generation_preset
+    g.tags_snapshot = { tags: %w[japan minimalism calm] }
+    g.started_at = 30.seconds.ago
+    g.finished_at = Time.current
+  end
+
+  palette = STYLE_PALETTES["japanese-minimalism"]
+
+  [
+    { kind: "main",       shift: 0,   summary: nil },
+    { kind: "mutation_a", shift: -15, summary: "Добавлен тег: Дерево" },
+    { kind: "mutation_b", shift: 20,  summary: "Замена: Спокойствие → Энергия" }
+  ].each do |vdata|
+    variant = GenerationVariant.find_or_create_by!(generation: generation, kind: vdata[:kind]) do |v|
+      v.status = "succeeded"
+      v.composed_prompt = "#{demo_style.generation_preset['style_prompt']}, notebook cover design"
+      v.mutation_summary = vdata[:summary]
+    end
+
+    unless variant.preview_image.attached?
+      blob = generate_variant_png(palette, vdata[:shift])
+      variant.preview_image.attach(
+        io: StringIO.new(blob),
+        filename: "variant-#{vdata[:kind]}.png",
+        content_type: "image/png"
+      )
+      puts "  ✓ Variant: #{vdata[:kind]}"
+    end
+  end
+
+  puts "Demo generation: design=#{design.slug}, generation_id=#{generation.id}"
+  puts "  View result at: /creations/#{design.id}/result"
+end
+
+puts "\n✓ Visual demo data complete!"

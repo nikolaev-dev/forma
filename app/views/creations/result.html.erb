@@ -1,0 +1,83 @@
+<% content_for(:title) { "Результат — FORMA" } %>
+
+<div class="pt-8 pb-4">
+  <%# Header %>
+  <div class="px-4 flex items-center justify-between">
+    <h1 class="text-xl font-bold">Результат</h1>
+    <span class="text-xs text-forma-gray-400"><%= @variants.size %> из 3</span>
+  </div>
+
+  <%# Карусель %>
+  <div class="mt-6" data-controller="result-carousel">
+    <div class="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-4 scrollbar-hide"
+         data-result-carousel-target="carousel">
+      <% @variants.each_with_index do |variant, idx| %>
+        <div class="flex-shrink-0 w-[calc(100vw-3rem)] snap-center"
+             data-result-carousel-target="card"
+             data-index="<%= idx %>">
+          <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-forma-gray-100">
+            <% if variant.preview_image.attached? %>
+              <%= image_tag variant.preview_image, class: "w-full h-full object-cover" %>
+            <% elsif variant.mockup_image.attached? %>
+              <%= image_tag variant.mockup_image, class: "w-full h-full object-cover" %>
+            <% else %>
+              <div class="w-full h-full flex items-center justify-center text-forma-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-16">
+                  <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mt-3 px-1">
+            <p class="text-sm font-medium">
+              <%= variant_label(variant) %>
+            </p>
+            <% if variant.mutation_summary.present? %>
+              <p class="text-xs text-forma-gray-500 mt-0.5"><%= variant.mutation_summary %></p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Dot-индикатор %>
+    <% if @variants.size > 1 %>
+      <div class="flex justify-center gap-1.5 mt-2">
+        <% @variants.size.times do |i| %>
+          <div class="w-1.5 h-1.5 rounded-full transition-colors
+                      <%= i == 0 ? 'bg-forma-black' : 'bg-forma-gray-300' %>"
+               data-result-carousel-target="dot"></div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Кнопки действий %>
+  <div class="px-4 mt-6 space-y-3">
+    <button class="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-forma-black">
+      Выбрать этот дизайн
+    </button>
+    <a href="<%= new_creation_path(style: @design.style&.slug) %>"
+       class="block w-full py-3.5 rounded-xl text-sm font-semibold text-forma-black bg-forma-gray-100 text-center">
+      Докрутить
+    </a>
+  </div>
+
+  <%# Панель поделиться / сохранить %>
+  <div class="px-4 mt-6 flex justify-center gap-6 text-forma-gray-500">
+    <button class="flex items-center gap-1.5 text-xs">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+        <path d="M13 4.5a2.5 2.5 0 1 1 .702 1.737L6.97 9.604a2.507 2.507 0 0 1 0 .798l6.733 3.366a2.5 2.5 0 1 1-.671 1.341l-6.733-3.366a2.5 2.5 0 1 1 0-3.48l6.733-3.366A2.52 2.52 0 0 1 13 4.5Z" />
+      </svg>
+      Поделиться
+    </button>
+    <button class="flex items-center gap-1.5 text-xs">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+        <path d="M10 2a.75.75 0 0 1 .75.75v5.59l1.95-2.1a.75.75 0 1 1 1.1 1.02l-3.25 3.5a.75.75 0 0 1-1.1 0L6.2 7.26a.75.75 0 1 1 1.1-1.02l1.95 2.1V2.75A.75.75 0 0 1 10 2Z" />
+        <path d="M5.273 4.5a1.25 1.25 0 0 0-1.205.918l-1.523 5.52c-.006.02-.01.041-.015.062H6a1 1 0 0 1 .894.553l.448.894a1 1 0 0 0 .894.553h3.438a1 1 0 0 0 .86-.49l.606-1.02A1 1 0 0 1 14 11h3.47a1.318 1.318 0 0 0-.015-.062l-1.523-5.52a1.25 1.25 0 0 0-1.205-.918h-.977a.75.75 0 0 1 0-1.5h.977a2.75 2.75 0 0 1 2.651 2.019l1.523 5.52c.066.239.099.485.099.732V15a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3.73c0-.246.033-.492.099-.73l1.523-5.521A2.75 2.75 0 0 1 5.273 3h.977a.75.75 0 0 1 0 1.5h-.977Z" />
+      </svg>
+      Сохранить
+    </button>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<% content_for(:title) { "FORMA — каталог" } %>
+
+<div class="px-4 pt-12 pb-4">
+  <h1 class="text-2xl font-bold tracking-tight text-center">FORMA</h1>
+</div>
+
+<%# Редакция FORMA — editorial styles %>
+<% if @editorial_styles.any? %>
+  <section class="mt-6">
+    <h2 class="px-4 text-lg font-semibold">Редакция FORMA</h2>
+    <div class="flex gap-3 overflow-x-auto px-4 mt-3 pb-2 snap-x snap-mandatory scrollbar-hide">
+      <% @editorial_styles.each do |style| %>
+        <%= render "shared/style_card", style: style %>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<%# Популярное сегодня %>
+<% if @popular_styles.any? %>
+  <section class="mt-8">
+    <h2 class="px-4 text-lg font-semibold">Популярное сегодня</h2>
+    <div class="grid grid-cols-2 gap-3 px-4 mt-3">
+      <% @popular_styles.each do |style| %>
+        <div>
+          <a href="<%= new_creation_path(style: style.slug) %>" class="block" data-turbo-action="advance">
+            <div class="aspect-[3/4] rounded-xl overflow-hidden bg-forma-gray-100">
+              <% if style.cover_image.attached? %>
+                <%= image_tag style.cover_image, class: "w-full h-full object-cover", loading: "lazy" %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center text-forma-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-10">
+                    <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+            <p class="mt-2 text-sm font-medium truncate"><%= style.name %></p>
+          </a>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<%# Секции каталога %>
+<% @sections.each do |section| %>
+  <% items = section.catalog_items.sort_by(&:position) %>
+  <% next if items.empty? %>
+  <section class="mt-8">
+    <h2 class="px-4 text-lg font-semibold"><%= section.name %></h2>
+    <div class="flex gap-3 overflow-x-auto px-4 mt-3 pb-2 snap-x snap-mandatory scrollbar-hide">
+      <% items.each do |catalog_item| %>
+        <% next unless catalog_item.item.is_a?(Style) && catalog_item.item.published? %>
+        <%= render "shared/style_card", style: catalog_item.item %>
+      <% end %>
+    </div>
+  </section>
+<% end %>

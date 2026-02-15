@@ -1,0 +1,15 @@
+<%# locals: (tag:, selected: false, selectable: true) %>
+<% if selectable %>
+  <button type="button"
+          class="inline-flex items-center px-3 py-1.5 rounded-full text-sm border transition-colors
+                 <%= selected ? 'bg-forma-black text-white border-forma-black' : 'bg-white text-forma-gray-700 border-forma-gray-200 hover:border-forma-gray-400' %>"
+          data-action="click->tag-selector#toggle"
+          data-tag-selector-tag-id-param="<%= tag.id %>"
+          data-tag-selector-tag-name-param="<%= tag.name %>">
+    <%= tag.name %>
+  </button>
+<% else %>
+  <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-forma-gray-100 text-forma-gray-600">
+    <%= tag.name %>
+  </span>
+<% end %>

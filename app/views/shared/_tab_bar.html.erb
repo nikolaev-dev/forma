@@ -1,0 +1,19 @@
+<nav class="fixed bottom-0 inset-x-0 bg-white border-t border-forma-gray-200 pb-safe z-50">
+  <div class="flex items-center justify-around h-16 max-w-lg mx-auto">
+    <% tab_bar_tabs.each do |tab| %>
+      <% if tab[:disabled] %>
+        <span class="flex flex-col items-center gap-0.5 text-forma-gray-300 px-3 py-2">
+          <%= tab[:icon] %>
+          <span class="text-[10px]"><%= tab[:name] %></span>
+        </span>
+      <% else %>
+        <a href="<%= tab[:href] %>"
+           class="flex flex-col items-center gap-0.5 px-3 py-2 <%= tab[:current] ? 'text-forma-black' : 'text-forma-gray-400' %>"
+           data-turbo-action="advance">
+          <%= tab[:icon] %>
+          <span class="text-[10px] font-medium"><%= tab[:name] %></span>
+        </a>
+      <% end %>
+    <% end %>
+  </div>
+</nav>
