@@ -30,6 +30,9 @@
 
 /public/assets
 
+# Ignore Tailwind CSS build artifacts.
+/app/assets/builds
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
