@@ -21,19 +21,19 @@
 
 ## Этап 0. Инфраструктура и каркас
 
-- [ ] Создать Rails-проект (Ruby on Rails 7+)
-- [ ] Настроить PostgreSQL (extensions: citext, pg_trgm, unaccent)
-- [ ] Настроить Redis + Sidekiq
-- [ ] Настроить ActiveStorage + S3-compatible (Yandex Object Storage / MinIO)
+- [x] Создать Rails-проект (Ruby on Rails 7+)
+- [x] Настроить PostgreSQL (extensions: citext, pg_trgm, unaccent)
+- [x] Настроить Redis + Sidekiq
+- [x] Настроить ActiveStorage + S3-compatible (Yandex Object Storage / MinIO)
 - [ ] Настроить CI/CD (опционально, но рекомендуется)
 - [ ] Настроить линтеры (RuboCop, etc.)
-- [ ] Создать базовые миграции: users, oauth_identities, anonymous_identities
-- [ ] Настроить OmniAuth (VK, Яндекс, T-Bank, Альфа, Gmail)
-- [ ] Базовая аутентификация (сессии/токены)
-- [ ] Конвенция enum: только строчные (string), не integer
-- [ ] Конвенция деньги: integer _cents
-- [ ] Настроить hashid-rails (gem `hashid-rails`, 6 символов, публичные ID)
-- [ ] Seed-данные: admin user, базовые app_settings
+- [x] Создать базовые миграции: users, oauth_identities, anonymous_identities
+- [x] Настроить OmniAuth (VK, Яндекс, T-Bank, Альфа, Gmail)
+- [x] Базовая аутентификация (сессии/токены)
+- [x] Конвенция enum: только строчные (string), не integer
+- [x] Конвенция деньги: integer _cents
+- [x] Настроить hashid-rails (gem `hashid-rails`, 6 символов, публичные ID)
+- [x] Seed-данные: admin user, базовые app_settings
 
 **Результат:** Rails-приложение запускается, авторизация работает, S3 подключен.
 
@@ -42,30 +42,30 @@
 ## Этап 1. Ядро: теги, стили, каталог
 
 ### 1.1. Теги
-- [ ] Миграция: tag_categories
-- [ ] Миграция: tags (visibility: string, kind: string, weight, is_banned)
-- [ ] Миграция: tag_synonyms
-- [ ] Миграция: tag_relations
-- [ ] Модель Tag + валидации
-- [ ] Модель TagCategory + валидации
-- [ ] Модель TagSynonym
-- [ ] Модель TagRelation
-- [ ] Сервис: CSV-импорт тегов
-- [ ] Seed-данные: базовый набор тегов по категориям (страны, сезоны, стихии, материалы, настроения)
-- [ ] Trigram-индекс на tags.name для автодополнения
+- [x] Миграция: tag_categories
+- [x] Миграция: tags (visibility: string, kind: string, weight, is_banned)
+- [x] Миграция: tag_synonyms
+- [x] Миграция: tag_relations
+- [x] Модель Tag + валидации
+- [x] Модель TagCategory + валидации
+- [x] Модель TagSynonym
+- [x] Модель TagRelation
+- [x] Сервис: CSV-импорт тегов
+- [x] Seed-данные: базовый набор тегов по категориям (страны, сезоны, стихии, материалы, настроения)
+- [x] Trigram-индекс на tags.name для автодополнения
 
 ### 1.2. Стили
-- [ ] Миграция: styles (status: string, generation_preset: jsonb)
-- [ ] Миграция: style_tags (M2M)
-- [ ] Модель Style + ActiveStorage (cover_image, gallery_images)
-- [ ] Модель StyleTag
+- [x] Миграция: styles (status: string, generation_preset: jsonb)
+- [x] Миграция: style_tags (M2M)
+- [x] Модель Style + ActiveStorage (cover_image, gallery_images)
+- [x] Модель StyleTag
 - [ ] Seed-данные: 10-30 стилей с тегами и изображениями
 
 ### 1.3. Каталог
-- [ ] Миграция: catalog_sections, catalog_items
-- [ ] Модели CatalogSection, CatalogItem
-- [ ] Эндпойнт: GET /catalog/styles (список стилей)
-- [ ] Логика "Редакция FORMA" (стили с rating >= 4)
+- [x] Миграция: catalog_sections, catalog_items
+- [x] Модели CatalogSection, CatalogItem
+- [x] Эндпойнт: GET /catalog/styles (список стилей)
+- [x] Логика "Редакция FORMA" (стили с rating >= 4)
 
 **Результат:** Есть теги, стили, каталог. Можно наполнять через seed/консоль.
 
@@ -74,38 +74,38 @@
 ## Этап 2. Генерация + мутации
 
 ### 2.1. Дизайны
-- [ ] Миграция: designs (visibility: string, moderation_status: string, search_vector: tsvector)
-- [ ] Миграция: design_tags (M2M)
-- [ ] Модель Design + ActiveStorage (hero_image, share_image)
-- [ ] Модель DesignTag
+- [x] Миграция: designs (visibility: string, moderation_status: string, search_vector: tsvector)
+- [x] Миграция: design_tags (M2M)
+- [x] Модель Design + ActiveStorage (hero_image, share_image)
+- [x] Модель DesignTag
 
 ### 2.2. Генерации
-- [ ] Миграция: generations (source: string, status: string)
-- [ ] Миграция: generation_variants (kind: string, status: string)
-- [ ] Модель Generation + state machine
-- [ ] Модель GenerationVariant + state machine + ActiveStorage (preview_image, mockup_image, hires_image)
+- [x] Миграция: generations (source: string, status: string)
+- [x] Миграция: generation_variants (kind: string, status: string)
+- [x] Модель Generation + state machine
+- [x] Модель GenerationVariant + state machine + ActiveStorage (preview_image, mockup_image, hires_image)
 
 ### 2.3. Провайдер генерации
-- [ ] Абстракция GenerationProvider (interface)
-- [ ] Реализация первого провайдера (Stable Diffusion / DALL-E / Midjourney API / etc.)
-- [ ] Конфигурация провайдера через app_settings
+- [x] Абстракция GenerationProvider (interface)
+- [x] Реализация первого провайдера (Stable Diffusion / DALL-E / Midjourney API / etc.)
+- [x] Конфигурация провайдера через app_settings
 
 ### 2.4. Prompt Composer
-- [ ] Сервис PromptComposer: сборка финального промпта
-- [ ] Учет стиля, тегов, скрытых тегов
-- [ ] Системные ограничения (no logos, brand mood only)
+- [x] Сервис PromptComposer: сборка финального промпта
+- [x] Учет стиля, тегов, скрытых тегов
+- [x] Системные ограничения (no logos, brand mood only)
 
 ### 2.5. Tag Mutation Engine
-- [ ] Сервис TagMutationEngine: выбор 1-2 тегов для мутаций
-- [ ] Учет предпочтений, совместимости, запретов
-- [ ] Генерация mutation_summary ("заменили X на Y")
+- [x] Сервис TagMutationEngine: выбор 1-2 тегов для мутаций
+- [x] Учет предпочтений, совместимости, запретов
+- [x] Генерация mutation_summary ("заменили X на Y")
 
 ### 2.6. Пайплайн
-- [ ] Sidekiq Job: GenerationJob
-- [ ] Создание 3 вариантов (main + mutation_a + mutation_b)
-- [ ] Параллельная отправка провайдеру
-- [ ] Сохранение результатов в ActiveStorage
-- [ ] Обновление статусов (created -> queued -> running -> succeeded/failed)
+- [x] Sidekiq Job: GenerationJob
+- [x] Создание 3 вариантов (main + mutation_a + mutation_b)
+- [x] Параллельная отправка провайдеру
+- [x] Сохранение результатов в ActiveStorage
+- [x] Обновление статусов (created -> queued -> running -> succeeded/failed)
 
 ### 2.7. Мокапы
 - [ ] Пост-обработка: наложение превью на шаблон блокнота
@@ -163,10 +163,10 @@
 - [ ] CTA "Обновить (3 превью)"
 
 ### 3.8. Страница дизайна (S7)
-- [ ] Публичная страница по slug или hashid
-- [ ] OG/meta-теги для шаринга
-- [ ] Кнопки: Ремикснуть, Заказать
-- [ ] Блоки: ремиксы, похожие
+- [x] Публичная страница по slug или hashid
+- [x] OG/meta-теги для шаринга
+- [x] Кнопки: Ремикснуть, Заказать
+- [x] Блоки: ремиксы, похожие
 
 ### 3.9. Поиск (S13)
 - [ ] Full-text поиск по designs (tsvector)
@@ -178,7 +178,7 @@
 - [ ] Профиль (гость/авторизован)
 - [ ] Мои дизайны (S16)
 - [ ] Мои заказы (S17)
-- [ ] Избранное (S14)
+- [x] Избранное (S14)
 
 **Результат:** Полный пользовательский флоу от каталога до результата генерации.
 
