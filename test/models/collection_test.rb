@@ -55,7 +55,7 @@ class CollectionTest < ActiveSupport::TestCase
     c2 = create(:collection, position: 2)
     c1 = create(:collection, position: 1)
     c3 = create(:collection, position: 3)
-    assert_equal [c1, c2, c3], Collection.ordered.to_a
+    assert_equal [ c1, c2, c3 ], Collection.ordered.to_a
   end
 
   test "has_many designs" do

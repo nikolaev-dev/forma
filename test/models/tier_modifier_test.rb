@@ -41,7 +41,7 @@ class TierModifierTest < ActiveSupport::TestCase
     lux = create(:tier_modifier, :lux)
     core = create(:tier_modifier, :core)
     sig = create(:tier_modifier, :signature)
-    assert_equal [core, sig, lux], TierModifier.ordered.to_a
+    assert_equal [ core, sig, lux ], TierModifier.ordered.to_a
   end
 
   test "settings is jsonb" do

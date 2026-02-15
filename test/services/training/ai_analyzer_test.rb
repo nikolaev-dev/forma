@@ -11,7 +11,7 @@ class Training::AiAnalyzerTest < ActiveSupport::TestCase
       "base_prompt" => "Japanese zen garden in autumn",
       "suggested_tags" => %w[japan autumn nature],
       "mood" => "serene",
-      "dominant_colors" => ["#8B0000", "#FFD700"],
+      "dominant_colors" => [ "#8B0000", "#FFD700" ],
       "visual_style" => "watercolor",
       "complexity" => "high"
     }
@@ -33,7 +33,7 @@ class Training::AiAnalyzerTest < ActiveSupport::TestCase
     mock_response = mock("response")
     mock_response.stubs(:is_a?).with(Net::HTTPSuccess).returns(true)
     mock_response.stubs(:body).returns({
-      "content" => [{ "text" => @analysis_result.to_json }]
+      "content" => [ { "text" => @analysis_result.to_json } ]
     }.to_json)
 
     Net::HTTP.any_instance.stubs(:request).returns(mock_response)
@@ -54,7 +54,7 @@ class Training::AiAnalyzerTest < ActiveSupport::TestCase
     mock_response = mock("response")
     mock_response.stubs(:is_a?).with(Net::HTTPSuccess).returns(true)
     mock_response.stubs(:body).returns({
-      "choices" => [{ "message" => { "content" => @analysis_result.to_json } }]
+      "choices" => [ { "message" => { "content" => @analysis_result.to_json } } ]
     }.to_json)
 
     Net::HTTP.any_instance.stubs(:request).returns(mock_response)
@@ -76,7 +76,7 @@ class Training::AiAnalyzerTest < ActiveSupport::TestCase
     mock_response = mock("response")
     mock_response.stubs(:is_a?).with(Net::HTTPSuccess).returns(true)
     mock_response.stubs(:body).returns({
-      "content" => [{ "text" => json_with_fences }]
+      "content" => [ { "text" => json_with_fences } ]
     }.to_json)
 
     Net::HTTP.any_instance.stubs(:request).returns(mock_response)
@@ -141,7 +141,7 @@ class Training::AiAnalyzerTest < ActiveSupport::TestCase
     mock_response = mock("response")
     mock_response.stubs(:is_a?).with(Net::HTTPSuccess).returns(true)
     mock_response.stubs(:body).returns({
-      "content" => [{ "text" => "not valid json at all" }]
+      "content" => [ { "text" => "not valid json at all" } ]
     }.to_json)
 
     Net::HTTP.any_instance.stubs(:request).returns(mock_response)

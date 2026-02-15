@@ -30,7 +30,7 @@ module Generations
     private
 
     def build_prompt
-      parts = [SCENE_SETUP]
+      parts = [ SCENE_SETUP ]
       parts << @curated_prompt if @curated_prompt.present?
       parts << @tier_modifier.prompt_modifier
       parts << @tier_modifier.identity_elements if @tier_modifier.identity_elements.present?

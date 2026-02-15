@@ -55,7 +55,7 @@ class TrainingPipelineFlowTest < ActiveSupport::TestCase
       "base_prompt" => "Japanese zen garden with red maple trees",
       "suggested_tags" => %w[japan autumn garden],
       "mood" => "serene",
-      "dominant_colors" => ["#8B0000", "#FFD700"],
+      "dominant_colors" => [ "#8B0000", "#FFD700" ],
       "visual_style" => "watercolor",
       "complexity" => "high"
     }
@@ -65,7 +65,7 @@ class TrainingPipelineFlowTest < ActiveSupport::TestCase
       "base_prompt" => "Tranquil Japanese garden with autumn foliage",
       "suggested_tags" => %w[japan garden nature],
       "mood" => "peaceful",
-      "dominant_colors" => ["#8B0000", "#2F4F4F"],
+      "dominant_colors" => [ "#8B0000", "#2F4F4F" ],
       "visual_style" => "illustration",
       "complexity" => "medium"
     }

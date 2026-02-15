@@ -10,7 +10,7 @@ class ReferenceImageAnalysisJobTest < ActiveSupport::TestCase
       "base_prompt" => "Japanese zen garden in autumn",
       "suggested_tags" => %w[japan autumn],
       "mood" => "serene",
-      "dominant_colors" => ["#8B0000"],
+      "dominant_colors" => [ "#8B0000" ],
       "visual_style" => "watercolor",
       "complexity" => "high"
     }
